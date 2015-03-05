@@ -8,30 +8,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Yugioh_AtemReturns.GameObjects
 {
-    enum ID
-    {
-        BACKSIDE,
-        MC0001,
-        MC0002,
-        MC0003,
-        MC0004,
-        MC0005,
-        pha_s_ba,
-        pha_s_dr,
-        pha_s_en,
-        pha_s_m1,
-        pha_s_m2,
-        pha_s_st,
-    }
 
-    enum STATUS
-    {
-        NORMAL,
-        DESTROY,
-        MOUSEON,
-        DEF,
-        ATK,
-    }
     class MyObject
     {
         Sprite m_sprite;
