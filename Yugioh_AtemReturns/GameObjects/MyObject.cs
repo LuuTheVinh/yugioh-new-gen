@@ -5,41 +5,61 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
+using Yugioh_AtemReturns.Manager;
 
 namespace Yugioh_AtemReturns.GameObjects
 {
-
-    class MyObject
+    public enum STATUS
     {
-        Sprite m_sprite;
-        ID m_id;
-        STATUS m_status;
+        NORMAL
 
-        #region Property
+    }
 
+    public enum ID
+    {
+
+    }
+
+    public class MyObject
+    {
+        private Sprite m_Sprite;
+        private ID m_Id;
+        private STATUS m_Status;
+        private Vector2 m_Position;
+
+        #region Properties
         public Sprite Sprite
         {
-            get { return m_sprite; }
-            set { m_sprite = value; }
+            get { return m_Sprite; }
+            set { m_Sprite = value; }
         }
         public ID ID
         {
-            get { return m_id; }
-            set { m_id = value; }
+            get { return m_Id; }
+            set { m_Id = value; }
         }
         public STATUS Status
         {
-            get { return m_status; }
-            set { m_status = value; }
+            get { return m_Status; }
+            set { m_Status = value; }
+        }
+        public virtual Vector2 Position 
+        {
+            get { return m_Position; }
+            set 
+            { 
+                m_Position = value;
+                m_Sprite.Position = m_Position;
+            }
         }
         
         #endregion
 
-        public MyObject(ContentManager _content,ID _id)
+        public MyObject(ContentManager _content, SpriteID _id)
         {
-            //Sprite = new Sprite(SpriteManager.getInstance(_content).GetSprite(_id));
+            Sprite = new Sprite(SpriteManager.getInstance(_content).GetSprite(_id));
             Status = STATUS.NORMAL;
-            ID = _id;
+            //ID = _id;
         }
         protected MyObject()
         {
@@ -53,6 +73,11 @@ namespace Yugioh_AtemReturns.GameObjects
                 Sprite.CurFrameH * Sprite.Size.Y,
                 Sprite.Size.X,
                 Sprite.Size.Y);
+        }
+
+        public virtual void Update(GameTime gameTime)
+        {
+            //
         }
 
         public virtual void Draw(SpriteBatch _spritebatch)
