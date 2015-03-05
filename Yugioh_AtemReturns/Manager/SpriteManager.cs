@@ -34,7 +34,7 @@ namespace Yugioh_AtemReturns.Manager
         /// </summary>
         /// <param name="_id"></param>
         /// <returns></returns>
-        public Sprite GetSprite(ID _id)
+        public Sprite GetSprite(SpriteID _id)
         {
 			try{
             return _listSprite[(int)_id];
@@ -47,15 +47,23 @@ namespace Yugioh_AtemReturns.Manager
 
         private void LoadContent(ContentManager _content)
         {
-            for (int i = 0; i < Enum.GetValues(typeof(ID)).Length; i++)//lấy tất cả enum để load file hình. nếu không tìm thấy thì bỏ qua
+            for (int i = 0; i < Enum.GetValues(typeof(SpriteID)).Length; i++)//lấy tất cả enum để load file hình. nếu không tìm thấy thì bỏ qua
             {
                 _listSprite.Add(
-                     new Sprite(_content,((ID)i).ToString())); 
+                     new Sprite(_content,this.getFormatFileName((SpriteID)i))); 
 					 // Đoạn này đặt đường dẫn đơn giản nên ràng buộc tất cả hình phải cùng để trong thự mục content
 					 // Nếu muốn đặt hình trong thư mục khác thì sửa lại đường dẫn
 					 // Nếu muốn đặt các hình ở thư mục khác nhau thì quy ước lấy một vài chữ cái đầu của thư mục làm các chữ cái đầu của IDictionary
 					 //rồi sửa đường dẫn bằng các phương thức của strin :))
 			}
+        }
+        private string getFormatFileName(SpriteID _id)
+        {
+            if (_id.ToString().StartsWith("C")) // quy ước các hình các lá bài bắt đầu bằng chữ C nên đừng sử dụng chữ c cho cái khác nữa
+            {
+                return _id.ToString().Substring(1);
+            }
+            return _id.ToString();
         }
     }
 }
