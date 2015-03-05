@@ -11,8 +11,15 @@
 namespace Yugioh_AtemReturns
 {
     #region Enum
+
+    enum SpriteID
+    {
+
+    }
+
     enum ID
     {
+
     }
 
     enum STATUS
