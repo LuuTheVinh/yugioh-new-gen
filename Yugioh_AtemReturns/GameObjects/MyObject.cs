@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 
-namespace T
+namespace Yugioh_AtemReturns.GameObjects
 {
     enum ID
     {
@@ -60,7 +60,7 @@ namespace T
 
         public MyObject(ContentManager _content,ID _id)
         {
-            Sprite = new Sprite(SpriteManager.getInstance(_content).GetSprite(_id));
+            //Sprite = new Sprite(SpriteManager.getInstance(_content).GetSprite(_id));
             Status = STATUS.NORMAL;
             ID = _id;
         }
