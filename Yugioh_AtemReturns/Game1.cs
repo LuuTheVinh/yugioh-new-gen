@@ -8,6 +8,9 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using Yugioh_AtemReturns.GameObjects;
+using Yugioh_AtemReturns.Scenes;
+using Yugioh_AtemReturns.Manager;
 
 namespace Yugioh_AtemReturns
 {
@@ -18,10 +21,14 @@ namespace Yugioh_AtemReturns
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Scene introScene;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferHeight = 480;
+            graphics.PreferredBackBufferWidth = 800;
+            this.IsMouseVisible = true;
             Content.RootDirectory = "Content";
         }
 
@@ -36,6 +43,12 @@ namespace Yugioh_AtemReturns
             // TODO: Add your initialization logic here
 
             base.Initialize();
+
+            /////////
+            introScene = new IntroScene();
+
+            SceneManager.getInstance().addScene(introScene);
+            SceneManager.getInstance().Init();
         }
 
         /// <summary>
@@ -48,6 +61,7 @@ namespace Yugioh_AtemReturns
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+            SceneManager.getInstance().Content = Content;
         }
 
         /// <summary>
@@ -72,6 +86,8 @@ namespace Yugioh_AtemReturns
 
             // TODO: Add your update logic here
 
+            SceneManager.getInstance().Update(gameTime);
+
             base.Update(gameTime);
         }
 
@@ -84,6 +100,11 @@ namespace Yugioh_AtemReturns
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
+            spriteBatch.Begin();
+
+            SceneManager.getInstance().Render(spriteBatch);
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
