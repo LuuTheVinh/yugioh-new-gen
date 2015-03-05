@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
+using Yugioh_AtemReturns.GameObjects;
 
 namespace Yugioh_AtemReturns.Manager
 {
@@ -40,7 +41,7 @@ namespace Yugioh_AtemReturns.Manager
 			try{
             return _listSprite[(int)_id];
 			}
-			catch()
+			catch
 			{
 				throw new Exception("Id: \'" + _id + "\' is not exists");
 			}
