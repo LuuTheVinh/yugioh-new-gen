@@ -13,12 +13,10 @@ namespace Yugioh_AtemReturns.Manager
     {
         private static SpriteManager m_instance;
         private List<Sprite> _listSprite;
-        private int Total;
 
         private SpriteManager(ContentManager _content)
         {
             _listSprite = new List<Sprite>();
-            Total = Enum.GetValues(typeof(ID)).Length; //lấy tất cả enum để load file hình. nếu không tìm thấy thì bỏ qua (xem hàm load)
             LoadContent(_content);
 
         }
@@ -49,7 +47,7 @@ namespace Yugioh_AtemReturns.Manager
 
         private void LoadContent(ContentManager _content)
         {
-            for(int i = 0; i < Total; i++)
+            for (int i = 0; i < Enum.GetValues(typeof(ID)).Length; i++)//lấy tất cả enum để load file hình. nếu không tìm thấy thì bỏ qua
             {
                 _listSprite.Add(
                      new Sprite(_content,((ID)i).ToString())); 
