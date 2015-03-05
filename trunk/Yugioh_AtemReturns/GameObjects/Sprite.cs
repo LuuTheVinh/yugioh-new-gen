@@ -8,7 +8,8 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Yugioh_AtemReturns.GameObjects
 {
-    class Sprite
+    public enum SpriteID { }
+    public class Sprite
     {
         #region Field
         private Texture2D m_texture;
@@ -28,7 +29,7 @@ namespace Yugioh_AtemReturns.GameObjects
         private Rectangle m_Bound;
         #endregion
         
-        #region Property
+        #region Properties
 
         public Texture2D Texture
         {
