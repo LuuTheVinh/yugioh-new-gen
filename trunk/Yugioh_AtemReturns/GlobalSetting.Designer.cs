@@ -10,27 +10,6 @@
 
 namespace Yugioh_AtemReturns
 {
-    #region Enum
-
-    enum SpriteID
-    {
-
-    }
-
-    enum ID
-    {
-
-    }
-
-    enum STATUS
-    {
-        NORMAL,
-        DESTROY,
-        MOUSEON,
-        DEF,
-        ATK,      
-    }
-    #endregion
 
 
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
