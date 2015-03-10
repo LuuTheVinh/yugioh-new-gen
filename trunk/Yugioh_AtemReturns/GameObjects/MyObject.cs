@@ -9,17 +9,6 @@ using Yugioh_AtemReturns.Manager;
 
 namespace Yugioh_AtemReturns.GameObjects
 {
-    public enum STATUS
-    {
-        NORMAL
-
-    }
-
-    public enum ID
-    {
-
-    }
-
     public class MyObject
     {
         private Sprite m_Sprite;
@@ -55,18 +44,18 @@ namespace Yugioh_AtemReturns.GameObjects
         
         #endregion
 
-        public MyObject(ContentManager _content, SpriteID _id)
+        public MyObject(ContentManager _content, ID _id, SpriteID _spriteid)
         {
-            Sprite = new Sprite(SpriteManager.getInstance(_content).GetSprite(_id));
+            Sprite = new Sprite(SpriteManager.getInstance(_content).GetSprite(_spriteid));
             Status = STATUS.NORMAL;
-            //ID = _id;
+            ID = _id;
         }
         protected MyObject()
         {
             Sprite = null;
             Status = STATUS.NORMAL;
         }
-        protected virtual void setFrame()
+        protected virtual void SetFrame()
         {
             Sprite.Frame = new Rectangle(
                 Sprite.CurFrameW * Sprite.Size.X,
@@ -78,6 +67,7 @@ namespace Yugioh_AtemReturns.GameObjects
         public virtual void Update(GameTime gameTime)
         {
             //
+            Sprite.Update(gameTime);
         }
 
         public virtual void Draw(SpriteBatch _spritebatch)

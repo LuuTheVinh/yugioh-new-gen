@@ -16,7 +16,7 @@ namespace Yugioh_AtemReturns.GameObjects
     /// testButton.ButtonEvent += new Action(doSomething); 
     /// * hàm doSomething là hàm kiểu void() *
     /// </summary>
-    public class Button : MyObject //BaseObject
+    public class Button : MyObject
     {
         private Sprite normalImage;
         private Sprite selectedImage;
@@ -43,6 +43,36 @@ namespace Yugioh_AtemReturns.GameObjects
                     hoverImage.Position = this.Position;
                 if (this.selectedImage != null)
                     selectedImage.Position = this.Position;
+            }
+        }
+        public Vector2 Origin
+        {
+            get { return this.Sprite.Origin; }
+            set
+            {
+                if (this.Sprite != null)
+                    this.Sprite.Origin = value;
+                if (this.normalImage != null)
+                    normalImage.Origin = value;
+                if (this.hoverImage != null)
+                    hoverImage.Origin = value;
+                if (this.selectedImage != null)
+                    selectedImage.Origin = value;
+            }
+        }
+        public Vector2 Scale
+        {
+            get { return this.Sprite.Scale; }
+            set
+            {
+                if (this.Sprite != null)
+                    this.Sprite.Scale = value;
+                if (this.normalImage != null)
+                    normalImage.Scale = value;
+                if (this.hoverImage != null)
+                    hoverImage.Scale = value;
+                if (this.selectedImage != null)
+                    selectedImage.Scale = value;
             }
         }
         public bool Selected 
@@ -90,11 +120,13 @@ namespace Yugioh_AtemReturns.GameObjects
         
         public override void Update(GameTime gameTime)
         {
+            base.Update(gameTime);
             //Mouse
-            this.checkMouseUpdate();
+            this.CheckMouseUpdate();
+            
         }
 
-        private void checkMouseUpdate()
+        private void CheckMouseUpdate()
         {
             InputController.getInstance().Begin(); //Begin get input
 
@@ -102,7 +134,7 @@ namespace Yugioh_AtemReturns.GameObjects
             {
                 Debug.WriteLine(String.Format("{0},{1}", InputController.getInstance().MousePosition.X, InputController.getInstance().MousePosition.Y));
                 this.isSelected = true;
-                this.doButtonEvent();
+                this.DoButtonEvent();
             }
             else if (InputController.getInstance().IsLeftClick() && !isHovered)
             {
@@ -132,7 +164,7 @@ namespace Yugioh_AtemReturns.GameObjects
 
         public event Action ButtonEvent;
 
-        public void doButtonEvent()
+        public void DoButtonEvent()
         {
             if (ButtonEvent != null)
                 ButtonEvent();
