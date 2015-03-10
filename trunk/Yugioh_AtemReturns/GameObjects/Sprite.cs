@@ -5,10 +5,10 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
+using System.Diagnostics;
 
 namespace Yugioh_AtemReturns.GameObjects
 {
-    public enum SpriteID { }
     public class Sprite
     {
         #region Field
@@ -27,6 +27,20 @@ namespace Yugioh_AtemReturns.GameObjects
         private Vector2 m_origin;
         private Rectangle m_Frame;
         private Rectangle m_Bound;
+        private float m_Timer = 0;
+        //for Transforms
+        private Vector2 m_oldPosition;                                              //Move
+        private bool isMoveDone = true;                                     
+        private Vector2 m_Velocity;                                     
+        private float m_moveDistance;
+        private bool isScaleDone = true;                                            //Scale
+        private Vector2 speedScale;
+        private float scaleRatio;
+        private float scaleValue;
+        private bool isRotateDone = true;                                           //Rotate
+        private float oldRotation;
+        private float rotateValue;
+        private float speedRotate;
         #endregion
         
         #region Properties
@@ -125,18 +139,26 @@ namespace Yugioh_AtemReturns.GameObjects
         public Vector2 Origin
         {
             get { return m_origin; }
-            set { m_origin = value; }
+            set { 
+                m_origin = value;
+                m_Bound.X = (int)Position.X - (int)value.X;
+                m_Bound.Y = (int)Position.Y - (int)value.Y;
+            }
         }
         public Rectangle Bound
         {
             get { return m_Bound; }
             set { m_Bound = value; }
         }
+
+        public bool IsDone {
+            get { return (isMoveDone && isScaleDone); } 
+        }
         #endregion
 
-        public Sprite(ContentManager _contentManager, String _address)
+        public Sprite(ContentManager contentManager, String address)
         {
-            Texture = LoadContent(_contentManager, _address);
+            Texture = LoadContent(contentManager, address);
             Color = Color.White;
             Depth = 1.0f;
             Size = new Point(Texture.Bounds.Width, Texture.Bounds.Height);
@@ -147,28 +169,28 @@ namespace Yugioh_AtemReturns.GameObjects
             MaxFrameW = 1;
         }
 
-        public Sprite(Sprite _sprite)
+        public Sprite(Sprite sprite)
         {
-            this.Texture = _sprite.Texture;
-            this.Bound = _sprite.Bound;
-            this.Color = _sprite.Color;
-            this.CurFrameH = _sprite.CurFrameH;
-            this.CurFrameW = _sprite.CurFrameW;
-            this.Depth = _sprite.Depth;
-            this.Effect = _sprite.Effect;
-            this.Frame = _sprite.Frame;
-            this.MaxFrameH = _sprite.MaxFrameH;
-            this.MaxFrameW = _sprite.MaxFrameW;
-            this.Origin = _sprite.Origin;
-            this.Position = _sprite.Position;
-            this.Rotation = _sprite.Rotation;
-            this.Scale = _sprite.Scale;
-            this.Size = _sprite.Size;
+            Texture = sprite.Texture;
+            Bound = sprite.Bound;
+            Color = sprite.Color;
+            CurFrameH = sprite.CurFrameH;
+            CurFrameW = sprite.CurFrameW;
+            Depth = sprite.Depth;
+            Effect = sprite.Effect;
+            Frame = sprite.Frame;
+            MaxFrameH = sprite.MaxFrameH;
+            MaxFrameW = sprite.MaxFrameW;
+            Origin = sprite.Origin;
+            Position = sprite.Position;
+            Rotation = sprite.Rotation;
+            Scale = sprite.Scale;
+            Size = sprite.Size;
         }
 
-        private Texture2D LoadContent(ContentManager _contentManager, String _address)
+        private Texture2D LoadContent(ContentManager contentManager, String address)
         {
-            return _contentManager.Load<Texture2D>(_address);
+            return contentManager.Load<Texture2D>(address);
         }
 
         public void Draw(SpriteBatch _spritebatch)
@@ -185,5 +207,126 @@ namespace Yugioh_AtemReturns.GameObjects
                 Depth
             );
         }
+
+        public virtual void Update(GameTime gameTime)
+        {
+            
+        }
+
+        #region Sprite Transforms
+        public void MoveTo(GameTime gameTime, float time, Vector2 nextposition)
+        {
+            if(isMoveDone)
+            {
+                isMoveDone = false;
+                var velocityX = (nextposition.X - Position.X) / (time * 60); //60 là fps
+                var velocityY = (nextposition.Y - Position.Y) / (time * 60);
+                m_Velocity = new Vector2(velocityX, velocityY);
+                
+                m_moveDistance = (float)Math.Sqrt(
+                                            (nextposition.X - Position.X) * (nextposition.X - Position.X) +
+                                            (nextposition.Y - Position.Y) * (nextposition.Y - Position.Y)
+                                        );
+                m_oldPosition = Position;
+            }
+
+            var distance = (float)Math.Sqrt(((Position.X - m_oldPosition.X) * (Position.X - m_oldPosition.X) +
+                                        (Position.Y - m_oldPosition.Y) * (Position.Y - m_oldPosition.Y)));
+            
+            if (m_moveDistance >= distance && !isMoveDone)
+            {
+                //Kiểm tra lần di chuyển cuối cùng có vượt ra khỏi vị trí đích hay không
+                if ((float)Math.Sqrt(m_Velocity.X * m_Velocity.X + m_Velocity.Y * m_Velocity.Y) > (m_moveDistance - distance))
+                {
+                    //Nếu có thì gán vận tốc bằng quãng đường còn lại
+                    m_Velocity.X = nextposition.X - Position.X;
+                    m_Velocity.Y = nextposition.Y - Position.Y;
+                }
+                Position = new Vector2(Position.X + m_Velocity.X, Position.Y + m_Velocity.Y);
+            }
+            else
+            {
+                isMoveDone = true;
+                m_oldPosition = Position;
+            }
+        }
+        
+        public void MoveBy(GameTime gameTime, float time, Vector2 distance)
+        {
+            var nextposition = Position + distance;
+            MoveTo(gameTime, time, nextposition);
+        }
+
+        public void ScaleTo(GameTime gameTime, float time, Vector2 newscale)
+        {
+            if(isScaleDone)
+            {
+                speedScale.X = (newscale.X - Scale.X) / (time * 60);
+                speedScale.Y = (newscale.Y - Scale.Y) / (time * 60);
+
+                scaleRatio = (float)Math.Sqrt(
+                                             (newscale.X - Scale.X) * (newscale.X - Scale.X) +
+                                             (newscale.Y - Scale.Y) * (newscale.Y - Scale.Y)
+                                             );
+
+                isScaleDone = false;
+            }
+
+            scaleValue += (float)Math.Sqrt(speedScale.X * speedScale.X + speedScale.Y*speedScale.Y);
+
+            if(scaleRatio >= scaleValue && !isScaleDone)
+            {
+                if((Math.Abs(Scale.X - newscale.X) < speedScale.X) && (Math.Abs(Scale.Y - newscale.Y) < speedScale.Y))
+                {
+                    speedScale.X = newscale.X - Scale.X;
+                    speedScale.Y = newscale.Y - Scale.Y;
+                }
+                Scale = new Vector2(Scale.X + speedScale.X, Scale.Y + speedScale.Y);
+            }
+            else
+            {
+                isScaleDone = true;
+            }
+        }
+
+        public void ScaleBy(GameTime gameTime, float time, Vector2 scaleby)
+        {
+            Vector2 newscale = Scale + scaleby;
+            ScaleTo(gameTime, time, newscale);
+        }
+
+        public void RotateTo(GameTime gameTime, float time, float rotateto)
+        {
+            if (isRotateDone)
+            {
+                isRotateDone = false;
+                oldRotation = Rotation;
+                speedRotate = (rotateto - Rotation) / (time * 60);
+                rotateValue = rotateto - Rotation;
+            }
+
+            float rotated = Rotation - oldRotation;
+
+            if (rotateValue >= rotated && !isRotateDone)
+            {
+               if(Math.Abs(rotateto - rotated) < speedRotate)
+               {
+                   speedRotate = rotateto - Rotation;
+               }
+               Rotation += speedRotate;
+            }
+            else
+            {
+                isRotateDone = true;
+            }
+        }
+
+        public void RotateBy(GameTime gameTime, float time, float rotateby)
+        {
+            var rotateto = Rotation + rotateby;
+            RotateTo(gameTime, time, rotateto);
+        }
+
+        #endregion
     }
 }
