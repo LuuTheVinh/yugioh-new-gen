@@ -24,7 +24,7 @@ namespace Yugioh_AtemReturns.Manager
 
         }
 
-        public static SceneManager getInstance()
+        public static SceneManager GetInstance()
         {
             if(m_Instance == null)
             {
@@ -37,46 +37,48 @@ namespace Yugioh_AtemReturns.Manager
         { 
             if(m_ListScene.Count() != 0)
             {
-                m_ListScene[m_ListScene.Count() - 1].Init(this.Content);
+                m_ListScene.Last().Init(this.Content);
             }
         }
         public void Update(GameTime gametime)
         {
             if (m_ListScene.Count() != 0)
             {
-                m_ListScene[m_ListScene.Count() - 1].Update(gametime);
+                m_ListScene.Last().Update(gametime);
             }
         }
-        public void Render(SpriteBatch spriteBatch)
+
+        public void Draw(SpriteBatch spriteBatch)
         {
             if (m_ListScene.Count() != 0)
             {
-                m_ListScene[m_ListScene.Count() - 1].Render(spriteBatch);
+                m_ListScene.Last().Draw(spriteBatch);
             }
         }
 
-        public void addScene(Scene scene)
+        public void AddScene(Scene scene)
         {
             m_ListScene.Add(scene);
-            m_ListScene[m_ListScene.Count() - 1].Init(m_Content);
+            m_ListScene.Last().Init(m_Content);
         }
 
-        public void removeScene()
+        public void RemoveScene()
         {
             if(m_ListScene.Count() != 0)
             {
                 m_ListScene.RemoveAt(m_ListScene.Count() - 1);
             }
         }
-        public void replaceScene(Scene scene)
+        public void ReplaceScene(Scene scene)
         {
-            if(m_ListScene.Count() != 0)
+            if(m_ListScene.Count == 0)
             {
-                //add scene transation later...
-                //
-
-                this.removeScene();
-                this.addScene(scene);
+                AddScene(scene);
+            }
+            else
+            {
+                RemoveScene();
+                AddScene(scene);
             }
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
@@ -14,7 +15,6 @@ namespace Yugioh_AtemReturns.GameObjects
         private Sprite m_Sprite;
         private ID m_Id;
         private STATUS m_Status;
-        private Vector2 m_Position;
 
         #region Properties
         public Sprite Sprite
@@ -34,11 +34,38 @@ namespace Yugioh_AtemReturns.GameObjects
         }
         public virtual Vector2 Position 
         {
-            get { return m_Position; }
+            get { return m_Sprite.Position; }
             set 
             { 
-                m_Position = value;
-                m_Sprite.Position = m_Position;
+                if (this.Sprite != null)
+                    m_Sprite.Position = value;
+            }
+        }
+        public Vector2 Origin
+        {
+            get { return this.Sprite.Origin; }
+            set
+            {
+                if (this.Sprite != null)
+                    this.Sprite.Origin = value;
+            }
+        }
+        public Vector2 Scale
+        {
+            get { return this.Sprite.Scale; }
+            set
+            {
+                if (this.Sprite != null)
+                    this.Sprite.Scale = value;
+            }
+        }
+        public float Rotation
+        {
+            get { return this.Sprite.Rotation; }
+            set
+            {
+                if (this.Sprite != null)
+                    this.Sprite.Rotation = value;
             }
         }
         
@@ -49,6 +76,7 @@ namespace Yugioh_AtemReturns.GameObjects
             Sprite = new Sprite(SpriteManager.getInstance(_content).GetSprite(_spriteid));
             Status = STATUS.NORMAL;
             ID = _id;
+
         }
         protected MyObject()
         {
@@ -74,5 +102,36 @@ namespace Yugioh_AtemReturns.GameObjects
         {
             Sprite.Draw(_spritebatch);
         }
+
+        public virtual void MoveTo(GameTime gametime, float time, Vector2 position)
+        {
+            Sprite.MoveTo(gametime, time, position);
+        }
+
+        public virtual void MoveBy(GameTime gametime, float time, Vector2 position)
+        {
+            Sprite.MoveBy(gametime, time, position);
+        }
+
+        public virtual void ScaleTo(GameTime gameTime, float time, Vector2 newscale)
+        {
+            Sprite.ScaleTo(gameTime, time, newscale);
+        }
+
+        public virtual void ScaleBy(GameTime gameTime, float time, Vector2 scaleby)
+        {
+            Sprite.ScaleBy(gameTime, time, scaleby);
+        }
+
+        public virtual void RotateTo(GameTime gameTime, float time, float rotateto)
+        {
+            Sprite.RotateTo(gameTime, time, rotateto);
+        }
+
+        public virtual void RotateBy(GameTime gameTime, float time, float rotateby)
+        {
+            Sprite.RotateBy(gameTime, time, rotateby);
+        }
+
     }
 }

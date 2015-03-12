@@ -13,32 +13,51 @@ namespace Yugioh_AtemReturns.Scenes
 {
     public class IntroScene : Scene
     {
-        private Texture2D m_Texture;
+        private Sprite mySprite;
         private Button testButton;
         private Point visibleSize;
-        
         override public void Init(ContentManager content)
         {
+           
             visibleSize = new Point(GraphicsDeviceManager.DefaultBackBufferWidth, GraphicsDeviceManager.DefaultBackBufferHeight);
-            testButton = new Button(new Sprite(content, "normal"), new Sprite(content, "hover"));
+            testButton = new Button(new Sprite(content, "normal"), new Sprite(content, "hover"), new Sprite(content, "normal"));
             testButton.Position = new Vector2(visibleSize.X / 2, visibleSize.Y / 2);
-            
-            testButton.ButtonEvent += new Action(doSomething);
+            testButton.Origin = new Vector2(testButton.Sprite.Size.X / 2, testButton.Sprite.Size.Y / 2);
+            testButton.ButtonEvent += new Action(DoSomething);
+
+            mySprite = new Sprite(content, "Cat");
+            mySprite.Position = new Vector2(400, visibleSize.Y * 2);
+            mySprite.Origin = new Vector2(mySprite.Size.X / 2, mySprite.Size.Y / 2);
+            mySprite.Scale = new Vector2(0.2f, 0.2f);
         }
         override public void Update(GameTime gametime)
         {
             testButton.Update(gametime);
-            testButton.Rotation += 0.1f;
+
+            if (testButton.Selected)
+            {
+                mySprite.MoveTo(gametime, 0.5f, new Vector2(400, 100));
+                mySprite.ScaleTo(gametime, 0.5f, new Vector2(0.5f, 0.5f));
+                mySprite.RotateTo(gametime, 1.0f, MathHelper.Pi * 4);
+
+                testButton.RotateTo(gametime, 1.0f, MathHelper.Pi * 5);
+            }
         }
-        override public void Render(SpriteBatch spriteBatch)
+        override public void Draw(SpriteBatch spriteBatch)
         {
+            spriteBatch.Begin();
+
             testButton.Draw(spriteBatch);
-            //spriteBatch.Draw(m_Texture, new Vector2(100, 0), Color.White);
+            mySprite.Draw(spriteBatch);
+
+            spriteBatch.End();
         }
 
-        private void doSomething()
+        private void DoSomething()
         {
             Debug.WriteLine("OK! I'm in.");
+
         }
+
     }
 }
