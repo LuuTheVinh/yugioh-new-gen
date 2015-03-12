@@ -26,55 +26,7 @@ namespace Yugioh_AtemReturns.GameObjects
         private bool isSelected = false;
 
         #region Properties
-        public override Vector2 Position
-        {
-            get
-            {
-                return base.Position;
-            }
-            set
-            {
-                base.Position = value;
-                if(this.Sprite != null)
-                    this.Sprite.Position = this.Position;
-                if(this.normalImage != null)
-                    normalImage.Position = this.Position;
-                if (this.hoverImage != null)
-                    hoverImage.Position = this.Position;
-                if (this.selectedImage != null)
-                    selectedImage.Position = this.Position;
-            }
-        }
-        public Vector2 Origin
-        {
-            get { return this.Sprite.Origin; }
-            set
-            {
-                if (this.Sprite != null)
-                    this.Sprite.Origin = value;
-                if (this.normalImage != null)
-                    normalImage.Origin = value;
-                if (this.hoverImage != null)
-                    hoverImage.Origin = value;
-                if (this.selectedImage != null)
-                    selectedImage.Origin = value;
-            }
-        }
-        public Vector2 Scale
-        {
-            get { return this.Sprite.Scale; }
-            set
-            {
-                if (this.Sprite != null)
-                    this.Sprite.Scale = value;
-                if (this.normalImage != null)
-                    normalImage.Scale = value;
-                if (this.hoverImage != null)
-                    hoverImage.Scale = value;
-                if (this.selectedImage != null)
-                    selectedImage.Scale = value;
-            }
-        }
+        
         public bool Selected 
         {
             get { return isSelected; }
@@ -86,7 +38,8 @@ namespace Yugioh_AtemReturns.GameObjects
         public bool Hovered {
             get { return isHovered; }
             set 
-            { 
+            {
+                this.Rotation = this.Sprite.Rotation;
                 isHovered = value;
                 this.Sprite = hoverImage;
             }
@@ -123,7 +76,7 @@ namespace Yugioh_AtemReturns.GameObjects
             base.Update(gameTime);
             //Mouse
             this.CheckMouseUpdate();
-            
+            this.UpdateProperties();
         }
 
         private void CheckMouseUpdate()
@@ -144,19 +97,28 @@ namespace Yugioh_AtemReturns.GameObjects
             if (this.Sprite.Bound.Contains(InputController.getInstance().MousePosition) && !isHovered)
             {
                 Debug.WriteLine("hovered!");
-                this.Sprite = hoverImage;
+                if (hoverImage != null)
+                {
+                    this.Sprite = hoverImage;
+                }
                 isHovered = true;
             }
 
             if (!this.Sprite.Bound.Contains(InputController.getInstance().MousePosition))
             {
                 isHovered = false;
-                this.Sprite = normalImage;
+                if (normalImage != null)
+                {
+                    this.Sprite = normalImage;
+                }
             }
             
             if(isSelected)
             {
-                this.Sprite = selectedImage;
+                if (selectedImage != null)
+                {
+                    this.Sprite = selectedImage;
+                }
             }
 
             InputController.getInstance().End(); //End get input
@@ -168,6 +130,45 @@ namespace Yugioh_AtemReturns.GameObjects
         {
             if (ButtonEvent != null)
                 ButtonEvent();
+        }
+
+        private void UpdateProperties()
+        {
+            if (normalImage != null && Sprite != null)
+            {
+                if (normalImage.Position != Sprite.Position)
+                    normalImage.Position = Sprite.Position;
+                if (normalImage.Rotation != Sprite.Rotation)
+                    normalImage.Rotation = Sprite.Rotation;
+                if (normalImage.Scale != Sprite.Scale)
+                    normalImage.Scale = Sprite.Scale;
+                if (normalImage.Origin != Sprite.Origin)
+                    normalImage.Origin = Sprite.Origin;
+            }
+
+            if (selectedImage != null && Sprite != null)
+            {
+                if (selectedImage.Position != Sprite.Position)
+                    selectedImage.Position = Sprite.Position;
+                if (selectedImage.Rotation != Sprite.Rotation)
+                    selectedImage.Rotation = Sprite.Rotation;
+                if (selectedImage.Scale != Sprite.Scale)
+                    selectedImage.Scale = Sprite.Scale;
+                if (selectedImage.Origin != Sprite.Origin)
+                    selectedImage.Origin = Sprite.Origin;
+            }
+
+            if (hoverImage != null && Sprite != null)
+            {
+                if (hoverImage.Position != Sprite.Position)
+                    hoverImage.Position = Sprite.Position;
+                if (hoverImage.Rotation != Sprite.Rotation)
+                    hoverImage.Rotation = Sprite.Rotation;
+                if (hoverImage.Scale != Sprite.Scale)
+                    hoverImage.Scale = Sprite.Scale;
+                if (hoverImage.Origin != Sprite.Origin)
+                    hoverImage.Origin = Sprite.Origin;
+            }
         }
     }
 }

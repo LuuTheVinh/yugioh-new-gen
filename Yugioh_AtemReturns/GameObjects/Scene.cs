@@ -10,6 +10,7 @@ namespace Yugioh_AtemReturns.GameObjects
 {
     public class Scene
     {
+        private bool isPaused = false;
         virtual public void Init(ContentManager content)
         { }
         virtual public void Update(GameTime gametime)
@@ -18,7 +19,7 @@ namespace Yugioh_AtemReturns.GameObjects
         { }
         virtual public void Resume()
         { }
-        virtual public void Render(SpriteBatch spriteBatch)
+        virtual public void Draw(SpriteBatch spriteBatch)
         { }
     }
 }
