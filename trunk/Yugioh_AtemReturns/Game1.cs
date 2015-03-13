@@ -61,8 +61,8 @@ namespace Yugioh_AtemReturns
             /////////
             introScene = new IntroScene();
 
-            SceneManager.getInstance().addScene(introScene);
-            SceneManager.getInstance().Init();
+            SceneManager.GetInstance().AddScene(introScene);
+            SceneManager.GetInstance().Init();
 
             //maindeck = new MainDeck(ePlayerId.PLAYER);
             //maindeck.CreateDeck(this.Content, "1");
@@ -88,7 +88,7 @@ namespace Yugioh_AtemReturns
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            SceneManager.getInstance().Content = Content;
+            SceneManager.GetInstance().Content = Content;
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace Yugioh_AtemReturns
 
             // TODO: Add your update logic here
 
-            SceneManager.getInstance().Update(gameTime);
+            SceneManager.GetInstance().Update(gameTime);
             this.player.Update(gameTime);
 
             base.Update(gameTime);
@@ -130,7 +130,7 @@ namespace Yugioh_AtemReturns
             // TODO: Add your drawing code here
             spriteBatch.Begin();
 
-            SceneManager.getInstance().Render(spriteBatch);
+            SceneManager.GetInstance().Draw(spriteBatch);
 
             background.Draw(spriteBatch);
             //test0.Draw(spriteBatch);
