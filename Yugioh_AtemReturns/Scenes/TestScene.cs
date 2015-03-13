@@ -24,10 +24,10 @@ namespace Yugioh_AtemReturns.Scenes
             m_Position.X++;
             if(gametime.TotalGameTime.TotalMilliseconds >= 5000)
             {
-                SceneManager.getInstance().replaceScene(new IntroScene());
+                SceneManager.GetInstance().ReplaceScene(new IntroScene());
             }
         }
-        override public void Render(SpriteBatch spriteBatch)
+        override public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(m_Texture, m_Position, Color.White);
         }
