@@ -8,9 +8,15 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using Yugioh_AtemReturns.Cards;
+using Yugioh_AtemReturns.Cards.Monsters;
 using Yugioh_AtemReturns.GameObjects;
-using Yugioh_AtemReturns.Scenes;
 using Yugioh_AtemReturns.Manager;
+using Yugioh_AtemReturns.Scenes;
+using Yugioh_AtemReturns.Cards.Traps;
+using Yugioh_AtemReturns.Cards.Spells;
+using Yugioh_AtemReturns.Decks;
+using Yugioh_AtemReturns.Duelists;
 
 namespace Yugioh_AtemReturns
 {
@@ -23,13 +29,21 @@ namespace Yugioh_AtemReturns
         SpriteBatch spriteBatch;
         Scene introScene;
 
+
+        //MainDeck maindeck;
+        Sprite background;
+        //Yugioh_AtemReturns.Cards.Traps.Trap test0;
+        Duelist player;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferHeight = 480;
+            graphics.PreferredBackBufferHeight = 600;
             graphics.PreferredBackBufferWidth = 800;
             this.IsMouseVisible = true;
             Content.RootDirectory = "Content";
+
+            //graphics.ToggleFullScreen();
         }
 
         /// <summary>
@@ -49,6 +63,19 @@ namespace Yugioh_AtemReturns
 
             SceneManager.getInstance().addScene(introScene);
             SceneManager.getInstance().Init();
+
+            //maindeck = new MainDeck(ePlayerId.PLAYER);
+            //maindeck.CreateDeck(this.Content, "1");
+            //maindeck.Position = new Vector2(0, 300);
+
+            background = new Sprite(this.Content, "fie_burn");
+            background.Position = new Vector2(0, 0);
+            background.Depth = 0.0f;
+            player = new Player();
+            player.IntiMainDeck(this.Content);
+            //maindeck.Position = background.Position + GlobalSetting.Default.PlayerMain;
+            //test0 = new Cards.Traps.Trap(this.Content, SpriteID.C3005);
+            //test0.Postion = GlobalSetting.Default.PlayerSpellF + new Microsoft.Xna.Framework.Vector2(15, 8) + background.Position;
         }
 
         /// <summary>
@@ -87,6 +114,7 @@ namespace Yugioh_AtemReturns
             // TODO: Add your update logic here
 
             SceneManager.getInstance().Update(gameTime);
+            this.player.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -104,7 +132,12 @@ namespace Yugioh_AtemReturns
 
             SceneManager.getInstance().Render(spriteBatch);
 
+            background.Draw(spriteBatch);
+            //test0.Draw(spriteBatch);
             spriteBatch.End();
+
+            player.Draw(spriteBatch);
+            //maindeck.Draw(spriteBatch);
 
             base.Draw(gameTime);
         }
