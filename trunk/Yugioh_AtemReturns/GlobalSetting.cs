@@ -7,17 +7,21 @@ namespace Yugioh_AtemReturns
 {
     #region Enum
 
-    enum SpriteID
+    public enum SpriteID
     {
-
+        C1002,
+        C1003,
+        C3005,
+        C83764719,
+        CBackSide,
     }
 
-    enum ID
+    public enum ID
     {
-
+        CARD
     }
 
-    enum STATUS
+    public enum STATUS
     {
         NORMAL,
         DESTROY,
@@ -29,5 +33,6 @@ namespace Yugioh_AtemReturns
 
     internal sealed partial class GlobalSetting
     {
+
     }
 }

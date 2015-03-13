@@ -61,7 +61,7 @@ namespace Yugioh_AtemReturns.Manager
         {
             if (_id.ToString().StartsWith("C")) // quy ước các hình các lá bài bắt đầu bằng chữ C nên đừng sử dụng chữ c cho cái khác nữa
             {
-                return _id.ToString().Substring(1);
+                return ("card\\"+_id.ToString().Substring(1) );
             }
             return _id.ToString();
         }
