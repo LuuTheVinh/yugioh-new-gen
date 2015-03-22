@@ -8,16 +8,16 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Yugioh_AtemReturns {
+namespace Yugioh_AtemReturns.Duelists {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "10.0.0.0")]
-    internal sealed partial class GlobalSetting : global::System.Configuration.ApplicationSettingsBase {
+    internal sealed partial class ComputerSetting : global::System.Configuration.ApplicationSettingsBase {
         
-        private static GlobalSetting defaultInstance = ((GlobalSetting)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new GlobalSetting())));
+        private static ComputerSetting defaultInstance = ((ComputerSetting)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new ComputerSetting())));
         
-        public static GlobalSetting Default {
+        public static ComputerSetting Default {
             get {
                 return defaultInstance;
             }
@@ -25,37 +25,37 @@ namespace Yugioh_AtemReturns {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("740, 425")]
-        public global::Microsoft.Xna.Framework.Vector2 PlayerMain {
+        [global::System.Configuration.DefaultSettingValueAttribute("265, 105")]
+        public global::Microsoft.Xna.Framework.Vector2 MainDeck {
             get {
-                return ((global::Microsoft.Xna.Framework.Vector2)(this["PlayerMain"]));
+                return ((global::Microsoft.Xna.Framework.Vector2)(this["MainDeck"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("735, 330")]
-        public global::Microsoft.Xna.Framework.Vector2 PlayerGrave {
+        [global::System.Configuration.DefaultSettingValueAttribute("265, 197")]
+        public global::Microsoft.Xna.Framework.Vector2 GraveYard {
             get {
-                return ((global::Microsoft.Xna.Framework.Vector2)(this["PlayerGrave"]));
+                return ((global::Microsoft.Xna.Framework.Vector2)(this["GraveYard"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("330, 310")]
-        public global::Microsoft.Xna.Framework.Vector2 PlayerMonF {
+        [global::System.Configuration.DefaultSettingValueAttribute("640, 190")]
+        public global::Microsoft.Xna.Framework.Vector2 MonsterField {
             get {
-                return ((global::Microsoft.Xna.Framework.Vector2)(this["PlayerMonF"]));
+                return ((global::Microsoft.Xna.Framework.Vector2)(this["MonsterField"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("330, 410")]
-        public global::Microsoft.Xna.Framework.Vector2 PlayerSpellF {
+        [global::System.Configuration.DefaultSettingValueAttribute("640, 90")]
+        public global::Microsoft.Xna.Framework.Vector2 SpellField {
             get {
-                return ((global::Microsoft.Xna.Framework.Vector2)(this["PlayerSpellF"]));
+                return ((global::Microsoft.Xna.Framework.Vector2)(this["SpellField"]));
             }
         }
         
@@ -70,19 +70,10 @@ namespace Yugioh_AtemReturns {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("535, 300")]
-        public global::Microsoft.Xna.Framework.Vector2 CenterField {
+        [global::System.Configuration.DefaultSettingValueAttribute("765, 75")]
+        public global::Microsoft.Xna.Framework.Vector2 Hand {
             get {
-                return ((global::Microsoft.Xna.Framework.Vector2)(this["CenterField"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("290, 540")]
-        public global::Microsoft.Xna.Framework.Vector2 PlayerHand {
-            get {
-                return ((global::Microsoft.Xna.Framework.Vector2)(this["PlayerHand"]));
+                return ((global::Microsoft.Xna.Framework.Vector2)(this["Hand"]));
             }
         }
         

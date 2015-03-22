@@ -190,7 +190,7 @@ namespace Yugioh_AtemReturns.GameObjects
 
         private Texture2D LoadContent(ContentManager contentManager, String address)
         {
-                return contentManager.Load<Texture2D>(address);
+            return contentManager.Load<Texture2D>(address);
         }
 
         public void Draw(SpriteBatch _spritebatch)

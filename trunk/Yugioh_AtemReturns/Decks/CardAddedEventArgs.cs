@@ -6,10 +6,10 @@ using Yugioh_AtemReturns.Cards;
 
 namespace Yugioh_AtemReturns.Decks
 {
-     internal class CardAddedEventArgs
+     internal class CardEventArgs
     {
         public Card Card { get; set; }
-        public CardAddedEventArgs(Card card)
+        public CardEventArgs(Card card)
         {
             this.Card = card;
         }

@@ -141,5 +141,10 @@ namespace Yugioh_AtemReturns.Cards.Monsters
             this.PendulumScale = Original.PendulumScale;
             this.SpellSpeed = Original.SpellSpeed;
         }
+
+        public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
+        {
+            base.Update(gameTime);
+        }
     }
 }

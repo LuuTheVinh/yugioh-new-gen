@@ -10,7 +10,7 @@ using Yugioh_AtemReturns.Manager;
 
 namespace Yugioh_AtemReturns.GameObjects
 {
-    public class MyObject
+    public abstract class MyObject
     {
         private Sprite m_Sprite;
         private ID m_Id;
@@ -27,18 +27,18 @@ namespace Yugioh_AtemReturns.GameObjects
             get { return m_Id; }
             set { m_Id = value; }
         }
-        public STATUS Status
+        public virtual STATUS Status
         {
             get { return m_Status; }
             set { m_Status = value; }
         }
-        public virtual Vector2 Position 
+        public virtual Vector2 Position
         {
-            get { return m_Sprite.Position; }
-            set 
-            { 
+            get { return this.Sprite.Position; }
+            set
+            {
                 if (this.Sprite != null)
-                    m_Sprite.Position = value;
+                    this.Sprite.Position = value;
             }
         }
         public Vector2 Origin
@@ -50,7 +50,7 @@ namespace Yugioh_AtemReturns.GameObjects
                     this.Sprite.Origin = value;
             }
         }
-        public Vector2 Scale
+        public virtual Vector2 Scale
         {
             get { return this.Sprite.Scale; }
             set
@@ -59,7 +59,7 @@ namespace Yugioh_AtemReturns.GameObjects
                     this.Sprite.Scale = value;
             }
         }
-        public float Rotation
+        public virtual float Rotation
         {
             get { return this.Sprite.Rotation; }
             set

@@ -65,6 +65,10 @@ namespace Yugioh_AtemReturns.Duelists
         public virtual void Update(GameTime gametime)
         {
             Transfer.Update(this);
+            for (int i = 0; i < DuelDisk.Length; i++)
+            {
+                DuelDisk[i].Update(gametime);
+            }
         }
 
         public virtual void Init()
