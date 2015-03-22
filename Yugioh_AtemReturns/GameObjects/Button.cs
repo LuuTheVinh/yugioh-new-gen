@@ -24,7 +24,8 @@ namespace Yugioh_AtemReturns.GameObjects
 
         private bool isHovered = false;
         private bool isSelected = false;
-
+        private bool isRightClick;
+        private InputController input;
         #region Properties
         
         public bool Selected 
@@ -33,6 +34,16 @@ namespace Yugioh_AtemReturns.GameObjects
             set { 
                 isSelected = value;
                 this.Sprite = selectedImage;
+            }
+        }
+        public bool IsRightClick
+        {
+            get
+            {
+                return isRightClick;
+            }
+            set {
+                isRightClick = value;
             }
         }
         public bool Hovered {
@@ -44,6 +55,7 @@ namespace Yugioh_AtemReturns.GameObjects
                 this.Sprite = hoverImage;
             }
         }
+
         #endregion
 
         public Button(Sprite image)
@@ -73,28 +85,94 @@ namespace Yugioh_AtemReturns.GameObjects
         
         public override void Update(GameTime gameTime)
         {
+            if (input == null)
+                input = new InputController();
             base.Update(gameTime);
             //Mouse
             this.CheckMouseUpdate();
             this.UpdateProperties();
         }
 
+        //private void CheckMouseUpdate()
+        //{
+        //    InputController.getInstance().Begin(); //Begin get input
+
+
+        //    if (InputController.getInstance().IsLeftClick() && isHovered)
+        //    {
+        //        Debug.WriteLine(String.Format("{0},{1}", InputController.getInstance().MousePosition.X, InputController.getInstance().MousePosition.Y));
+        //        this.isSelected = true;
+        //        this.DoButtonEvent();
+        //    }
+        //    else if (InputController.getInstance().IsLeftClick() && !isHovered)
+        //    {
+        //        this.isSelected = false;
+        //    }
+
+
+        //    if (this.Sprite.Bound.Contains(InputController.getInstance().MousePosition) && !isHovered)
+        //    {
+        //        Debug.WriteLine("hovered!");
+        //        if (hoverImage != null)
+        //        {
+        //            this.Sprite = hoverImage;
+        //        }
+        //        isHovered = true;
+        //    }
+        //    if (!this.Sprite.Bound.Contains(InputController.getInstance().MousePosition))
+        //    {
+        //        isHovered = false;
+        //        if (normalImage != null)
+        //        {
+        //            this.Sprite = normalImage;
+        //        }
+        //        //Debug.WriteLine("no hovered!");
+        //        //Debug.WriteLine(Convert.ToString(InputController.getInstance().MousePosition.X) + " " +Convert.ToString(InputController.getInstance().MousePosition.Y));
+        //    }
+            
+        //    if(isSelected)
+        //    {
+        //        if (selectedImage != null)
+        //        {
+        //            this.Sprite = selectedImage;
+        //        }
+        //    }
+
+        //    InputController.getInstance().End(); //End get input
+        //}
         private void CheckMouseUpdate()
         {
-            InputController.getInstance().Begin(); //Begin get input
+            input.Begin(); //Begin get input
 
-            if (InputController.getInstance().IsLeftClick() && isHovered )
+
+            if (input.IsLeftClick())
             {
-                Debug.WriteLine(String.Format("{0},{1}", InputController.getInstance().MousePosition.X, InputController.getInstance().MousePosition.Y));
-                this.isSelected = true;
-                this.DoButtonEvent();
-            }
-            else if (InputController.getInstance().IsLeftClick() && !isHovered)
-            {
-                this.isSelected = false;
+                if (isHovered)
+                {
+                    Debug.WriteLine(String.Format("{0},{1}", input.MousePosition.X, input.MousePosition.Y));
+                    this.isSelected = true;
+                    this.DoButtonEvent();
+                }
+                else
+                {
+                    this.isSelected = false;
+                }
             }
 
-            if (this.Sprite.Bound.Contains(InputController.getInstance().MousePosition) && !isHovered)
+            if (input.IsRightLick())
+            {
+                if (isHovered)
+                {
+                    this.isRightClick = true;
+                    this.OnRightClick();
+                }
+                else
+                {
+                    this.isRightClick = false;
+                }
+            }
+
+            if (this.Sprite.Bound.Contains(input.MousePosition) && !isHovered)
             {
                 Debug.WriteLine("hovered!");
                 if (hoverImage != null)
@@ -103,8 +181,7 @@ namespace Yugioh_AtemReturns.GameObjects
                 }
                 isHovered = true;
             }
-
-            if (!this.Sprite.Bound.Contains(InputController.getInstance().MousePosition))
+            if (!this.Sprite.Bound.Contains(input.MousePosition))
             {
                 isHovered = false;
                 if (normalImage != null)
@@ -112,8 +189,8 @@ namespace Yugioh_AtemReturns.GameObjects
                     this.Sprite = normalImage;
                 }
             }
-            
-            if(isSelected)
+
+            if (isSelected)
             {
                 if (selectedImage != null)
                 {
@@ -121,17 +198,20 @@ namespace Yugioh_AtemReturns.GameObjects
                 }
             }
 
-            InputController.getInstance().End(); //End get input
+            input.End(); //End get input
         }
-
         public event Action ButtonEvent;
-
-        public void DoButtonEvent()
+        public event Action RightClick;
+        private void DoButtonEvent()
         {
             if (ButtonEvent != null)
                 ButtonEvent();
         }
-
+        private void OnRightClick()
+        {
+            if (RightClick != null)
+                RightClick();
+        }
         private void UpdateProperties()
         {
             if (normalImage != null && Sprite != null)

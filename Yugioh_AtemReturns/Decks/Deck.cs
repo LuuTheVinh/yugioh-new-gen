@@ -24,8 +24,8 @@ namespace Yugioh_AtemReturns.Decks
         COMPUTER
     }
 
-    delegate void CardAddedEventHandler(Deck sender, CardAddedEventArgs e);
-
+    delegate void CardAddedEventHandler(Deck sender, CardEventArgs e);
+    delegate void CardRemoveEventHandler(Deck sender, CardEventArgs e);
     abstract class Deck 
     {
 
@@ -38,14 +38,24 @@ namespace Yugioh_AtemReturns.Decks
         protected Vector2 m_position;
         protected LinkedListNode<Card> _outCard;
         protected eDeckId _outDest;
+        protected bool isListCardChanged;
 
         public event CardAddedEventHandler CardAdded;
-        protected virtual void OnCardAdded(CardAddedEventArgs e)
+
+        protected virtual void OnCardAdded(CardEventArgs e)
         {
+            isListCardChanged = true;
             if (CardAdded != null)
                 CardAdded(this, e);
-        }
 
+        }
+        public event CardRemoveEventHandler CardRemoved;
+        protected virtual void OnCardRemoved(CardEventArgs e)
+        {
+            isListCardChanged = true;
+            if (CardRemoved != null)
+                CardRemoved(this, e);
+        }
         #region Property
         public Vector2 Position
         {
@@ -60,10 +70,10 @@ namespace Yugioh_AtemReturns.Decks
         {
             get { return _listCard.ElementAt<Card>(index); }
         }
-        protected LinkedList<Card> ListCard
+        public LinkedList<Card> ListCard
         {
             get { return _listCard; }
-            set { _listCard = value; }
+            protected set { _listCard = value; }
         }
         public ePlayerId PlayerID
         {
@@ -100,7 +110,7 @@ namespace Yugioh_AtemReturns.Decks
         protected virtual void Init()
         {
             _listCard = new LinkedList<Card>();
-
+            isListCardChanged = false;
         }
 
         /// <summary>
@@ -110,12 +120,12 @@ namespace Yugioh_AtemReturns.Decks
         public virtual void AddTop(Card _card)
         {
             ListCard.AddLast(_card);
-            OnCardAdded(new CardAddedEventArgs(_card));
+            OnCardAdded(new CardEventArgs(_card));
         }
         public virtual void AddBot(Card _card)
         {
             ListCard.AddFirst(_card);
-            OnCardAdded(new CardAddedEventArgs(_card));
+            OnCardAdded(new CardEventArgs(_card));
         }
 
         public virtual LinkedListNode<Card> RemoveTop()
@@ -125,19 +135,21 @@ namespace Yugioh_AtemReturns.Decks
             LinkedListNode<Card> temp = ListCard.Last;
 
             ListCard.Remove(temp);
-
+            OnCardRemoved(new CardEventArgs(temp.Value));
             return temp;
         }
         public virtual LinkedListNode<Card> RemoveCard(Card _card)
         {
             LinkedListNode<Card> temp = ListCard.Find(_card);
             ListCard.Remove(temp);
+            OnCardRemoved(new CardEventArgs(temp.Value));
             return temp;
         }
         public virtual Card RemoveAt(int index)
         {
             var temp = ListCard.ElementAt<Card>(index);
             ListCard.Remove(temp);
+            OnCardRemoved(new CardEventArgs(temp));
             return temp;
         }
         protected virtual void MoveTopToDeck(eDeckId _id)
@@ -178,6 +190,16 @@ namespace Yugioh_AtemReturns.Decks
             }
         }
 
+        public virtual void Update(GameTime _gameTime)
+        {
+            this.isListCardChanged = false;
+            foreach (var item in ListCard)
+            {
+                item.Update(_gameTime);
+                if (this.isListCardChanged == true)
+                    break;
+            }
+        }
         public virtual void Draw(SpriteBatch _spriteBatch)
         {
             foreach (var card in ListCard)

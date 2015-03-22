@@ -10,16 +10,24 @@ namespace Yugioh_AtemReturns.GameObjects
 {
     public class Scene
     {
-        private bool isPaused = false;
-        virtual public void Init(ContentManager content)
-        { }
+        protected bool isPaused = false;
+        protected Game Game;
+
+        virtual public void Init(Game game)
+        {
+            this.Game = game;
+            this.Game.Window.Title = "Yugioh!!! Atem Returns";
+        }
         virtual public void Update(GameTime gametime)
-        { }
+        {
+
+        }
         virtual public void Pause()
         { }
         virtual public void Resume()
         { }
         virtual public void Draw(SpriteBatch spriteBatch)
         { }
+
     }
 }

@@ -13,12 +13,13 @@ namespace Yugioh_AtemReturns.Manager
     {
         private List<Scene> m_ListScene = new List<Scene>();
         private static SceneManager m_Instance;
-        private ContentManager m_Content;
+        private Game m_game;
 
-        public ContentManager Content {
-            get { return m_Content; }
-            set { m_Content = value; }
-        }
+        public Game Game
+        {
+            get { return m_game; }
+            set { m_game = value; }
+        }   
         private SceneManager()
         {
 
@@ -33,12 +34,13 @@ namespace Yugioh_AtemReturns.Manager
             return m_Instance;
         }
 
-        public void Init()
-        { 
+        public void Init(Game game)
+        {
             if(m_ListScene.Count() != 0)
             {
-                m_ListScene.Last().Init(this.Content);
+                m_ListScene.Last().Init(game);
             }
+            SpriteManager.getInstance(game.Content);
         }
         public void Update(GameTime gametime)
         {
@@ -59,7 +61,7 @@ namespace Yugioh_AtemReturns.Manager
         public void AddScene(Scene scene)
         {
             m_ListScene.Add(scene);
-            m_ListScene.Last().Init(m_Content);
+            m_ListScene.Last().Init(m_game);
         }
 
         public void RemoveScene()

@@ -15,7 +15,7 @@ namespace Yugioh_AtemReturns.Manager
         private MouseState oldMouse;
         private bool isBegin;
         private static InputController m_Instance;
-        private InputController()
+        public InputController()
         {
             newKey = new KeyboardState();
             oldKey = new KeyboardState();
