@@ -55,8 +55,8 @@ namespace Yugioh_AtemReturns.GameObjects
             get{return m_position;}
             set{
                 m_position = value;
-                m_Bound.X = (int)value.X;
-                m_Bound.Y = (int)value.Y;
+                m_Bound.X = (int)value.X - (int)Origin.X;
+                m_Bound.Y = (int)value.Y - (int)Origin.Y;
             }
         }
         public Color Color
@@ -89,6 +89,8 @@ namespace Yugioh_AtemReturns.GameObjects
                 m_scale = value;
                 m_Bound.Width =(int) (Texture.Width * value.X);
                 m_Bound.Height = (int)(Texture.Height * value.Y);
+                //m_origin.X = m_origin.X * value.X;
+                //m_origin.Y = m_origin.Y * value.Y;
             }
         }
         public float Rotation

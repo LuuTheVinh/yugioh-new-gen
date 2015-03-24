@@ -41,7 +41,7 @@ namespace Yugioh_AtemReturns.GameObjects
                     this.Sprite.Position = value;
             }
         }
-        public Vector2 Origin
+        public virtual Vector2 Origin
         {
             get { return this.Sprite.Origin; }
             set
