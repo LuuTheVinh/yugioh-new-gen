@@ -13,9 +13,12 @@ namespace Yugioh_AtemReturns.GameObjects
     {
         private Button yesButton, noButton;
         private bool resultChoice;
+        
         private string messageText;
         private SpriteFont font;
         private Vector2 messagePosition;
+
+        private InputController inputControls;
 
         private Point oldMousePos;
 
@@ -65,6 +68,8 @@ namespace Yugioh_AtemReturns.GameObjects
             }
         }
 
+        public bool IsShow { get; set; }
+
         #endregion
 
         public YesNoDialog(ContentManager content, string message)
@@ -95,6 +100,10 @@ namespace Yugioh_AtemReturns.GameObjects
             Sprite.Scale = new Vector2(1, ratio);
 
             oldMousePos = new Point(0, 0);
+
+            IsShow = false;
+
+            inputControls = new InputController();
             
         }
 
@@ -110,6 +119,9 @@ namespace Yugioh_AtemReturns.GameObjects
 
         public override void Draw(SpriteBatch _spritebatch)
         {
+            if(IsShow)
+            {
+
             base.Draw(_spritebatch);
 
             Sprite.Draw(_spritebatch);
@@ -117,7 +129,8 @@ namespace Yugioh_AtemReturns.GameObjects
             noButton.Draw(_spritebatch);
 
             _spritebatch.DrawString(font, messageText, messagePosition, Color.White);
-            
+
+            }
         }
 
         private void UpdateChangedValues()
@@ -153,32 +166,44 @@ namespace Yugioh_AtemReturns.GameObjects
         private void YesBtn_Clicked()
         {
             resultChoice = true;
+            Hide();
         }
 
         private void NoBtn_Clicked()
         {
             resultChoice = false;
+            Hide();
+        }
+
+        public void Show()
+        {
+            IsShow = true;
+        }
+
+        public void Hide()
+        {
+            IsShow = false;
         }
 
         //MOUSE UPDATE
         bool isInside = false;
         private void CheckMouseUpdate()
         {
-            InputController.getInstance().Begin();
+            inputControls.Begin();
 
-            if (Sprite.Bound.Contains(InputController.getInstance().MousePosition) && !isInside)
+            if (Sprite.Bound.Contains(inputControls.MousePosition) && !isInside)
             {
                 isInside = true;
             }
 
-            if (InputController.getInstance().IsLeftPress() && isInside)
+            if (inputControls.IsLeftPress() && isInside)
             {
-                if (oldMousePos != new Point(0, 0) && oldMousePos != InputController.getInstance().MousePosition)
+                if (oldMousePos != new Point(0, 0) && oldMousePos != inputControls.MousePosition)
                 {
-                    var dir = new Point(InputController.getInstance().MousePosition.X - oldMousePos.X, InputController.getInstance().MousePosition.Y - oldMousePos.Y);
+                    var dir = new Point(inputControls.MousePosition.X - oldMousePos.X, inputControls.MousePosition.Y - oldMousePos.Y);
                     Position = new Vector2(Position.X + dir.X, Position.Y + dir.Y);
                 }
-                oldMousePos = InputController.getInstance().MousePosition;
+                oldMousePos = inputControls.MousePosition;
             }
             else
             {
@@ -186,7 +211,7 @@ namespace Yugioh_AtemReturns.GameObjects
                 isInside = false;
             }
 
-            InputController.getInstance().End();
+            inputControls.End();
         }
 
         //WRAP TEXT
