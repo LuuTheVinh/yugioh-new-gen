@@ -14,7 +14,6 @@ namespace Yugioh_AtemReturns.Manager
         private MouseState newMouse;
         private MouseState oldMouse;
         private bool isBegin;
-        private static InputController m_Instance;
         public InputController()
         {
             newKey = new KeyboardState();
@@ -22,17 +21,6 @@ namespace Yugioh_AtemReturns.Manager
             newMouse = new MouseState();
             isBegin = false;
         }
-
-        public static InputController getInstance()
-        {
-            if (m_Instance == null)
-            {
-                m_Instance = new InputController();
-            }
-            
-            return m_Instance;
-        }
-
 
         public bool isKeyPress(Keys _keys)
         {
@@ -90,6 +78,24 @@ namespace Yugioh_AtemReturns.Manager
             }
 
             return result;
+        }
+
+        public bool IsLeftPress()
+        {
+            this.checkBegin();
+            if (newMouse.LeftButton == ButtonState.Pressed && oldMouse.LeftButton == ButtonState.Pressed)
+                return true;
+            else
+                return false;
+        }
+
+        public bool IsRightPress()
+        {
+            this.checkBegin();
+            if (newMouse.RightButton == ButtonState.Pressed && oldMouse.RightButton == ButtonState.Pressed)
+                return true;
+            else
+                return false;
         }
 
         public Point MousePosition
