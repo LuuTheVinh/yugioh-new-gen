@@ -22,17 +22,9 @@ namespace Yugioh_AtemReturns.Decks
 
         public override void Draw(SpriteBatch spritebatch)
         {
-            if (ListCard.Count == 0)
-                return;
-            LinkedListNode<Card> node = ListCard.Last;
-            int count = 0;
-            do
-            {
-                node.Value.Draw(spritebatch);
-                node = node.Previous;
-                count++;
-            }
-            while (count < ListCard.Count);
+            spritebatch.Begin();
+            base.Draw(spritebatch);
+            spritebatch.End();
         }
     }
 }

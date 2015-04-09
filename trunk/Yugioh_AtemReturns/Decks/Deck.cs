@@ -128,6 +128,12 @@ namespace Yugioh_AtemReturns.Decks
             OnCardAdded(new CardEventArgs(_card));
         }
 
+        public virtual void SendTo(LinkedListNode<Card >_card, eDeckId _deck)
+        {
+            this.OutCard = _card;
+            this.DestDeck = _deck;
+        }
+
         public virtual LinkedListNode<Card> RemoveTop()
         {
             if (ListCard.Count == 0)
@@ -206,6 +212,7 @@ namespace Yugioh_AtemReturns.Decks
             {
                 card.Draw(_spriteBatch);
             }
+  
         }
 
     }

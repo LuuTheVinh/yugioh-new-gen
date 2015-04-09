@@ -40,7 +40,7 @@ namespace Yugioh_AtemReturns.Decks
 
         public void CreateDeck(ContentManager _content, string _deckId)
         {
-            this.ListCard = LoadDeck.GetInstance().GetDeck(_content, "1");
+            this.ListCard = LoadDeck.GetInstance().GetDeck(_content, _deckId);
             this.Shuffle();
             if (ListCard.Count != 0)
                 this.Sprite = ListCard.First.Value.s_BackSide;

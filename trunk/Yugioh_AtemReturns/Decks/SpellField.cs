@@ -41,9 +41,7 @@ namespace Yugioh_AtemReturns.Decks
 
             this.DeckID = eDeckId.SPELLFIELD;
          
-            this.CardAdded += new CardAddedEventHandler(SpellField_CardAdded_SetPosition);
-            this.CardAdded += new CardAddedEventHandler(SpellField_CardAdded);
-            this.CardRemoved += new CardRemoveEventHandler(SpellField_CardRemove);
+
         }
 
         public override void Update(Microsoft.Xna.Framework.GameTime _gameTime)
@@ -56,23 +54,6 @@ namespace Yugioh_AtemReturns.Decks
             base.Draw(_spriteBatch);
             _spriteBatch.End();
         }
-        private void SpellField_CardAdded_SetPosition(Deck sender, CardEventArgs e)
-        {
-            e.Card.POSITION = new Vector2(
-                this.Position.X + this.CurrentSlot * GlobalSetting.Default.FieldSlot.X + 13,
-                this.Position.Y + 13);
-        }
-        private void SpellField_CardAdded(Deck sender, CardEventArgs e)
-        {
-            e.Card.LeftClick += null;
-            e.Card.Hovered += null;
-            e.Card.OutHovered += null;
-        }
-        private void SpellField_CardRemove(Deck sender, CardEventArgs e)
-        {
-            e.Card.LeftClick -= null;
-            e.Card.Hovered -= null;
-            e.Card.OutHovered -= null;
-        }
+
     }
 }
