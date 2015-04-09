@@ -12,6 +12,7 @@ namespace Yugioh_AtemReturns.Decks
     class MonsterField : Deck
     {
         private int curSlot;
+        private bool[] m_aSlot;
         public int CurrentSlot
         {
             get { return curSlot; }
@@ -21,7 +22,9 @@ namespace Yugioh_AtemReturns.Decks
                 if (value >= MaxCard)
                     curSlot = 0;
                 else
+                {
                     curSlot = value;
+                }
             }
         }
         public int MaxCard
@@ -36,7 +39,9 @@ namespace Yugioh_AtemReturns.Decks
         sealed protected override void Init()
         {
             base.Init();
-
+            this.CardAdded += new CardAddedEventHandler(MonsterField_CardAdded);
+            this.CardRemoved +=new CardRemoveEventHandler(MonsterField_CardRemoved);
+            m_aSlot = new bool[5];
         }
         public override void Update(GameTime _gameTime)
         {
@@ -48,6 +53,17 @@ namespace Yugioh_AtemReturns.Decks
             base.Draw(_spriteBatch);
             _spriteBatch.End();
         }
-
+        private void MonsterField_CardAdded(Deck sender, CardEventArgs e)
+        {
+            while (m_aSlot[CurrentSlot] == true)
+            {
+                CurrentSlot++;
+            }
+            m_aSlot[CurrentSlot] = true;
+        }
+        private void MonsterField_CardRemoved(Deck sender, CardEventArgs e)
+        {
+            m_aSlot[Convert.ToInt32((e.Card.Position.X - sender.Position.X) / GlobalSetting.Default.FieldSlot.X)] = false;
+        }
     }
 }
