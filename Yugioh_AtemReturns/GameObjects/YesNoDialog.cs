@@ -34,7 +34,7 @@ namespace Yugioh_AtemReturns.GameObjects
             set
             {
                 messageText = value;
-                messageText = WrapText(font, messageText, Sprite.Size.X - 60);
+                messageText = TextFormater.getIntance().WordWrap(font, messageText, Sprite.Size.X - 60);
             }
         }
 
@@ -89,8 +89,9 @@ namespace Yugioh_AtemReturns.GameObjects
             noButton.ButtonEvent += NoBtn_Clicked;
 
             font = content.Load<SpriteFont>("ArialBold");
+            
             messagePosition = new Vector2(Sprite.Position.X, Sprite.Position.Y);
-            messageText = WrapText(font, message, Sprite.Bound.Width - 60);
+            messageText = TextFormater.getIntance().WordWrap(font, message, Sprite.Bound.Width - 60);
 
             Origin = new Vector2(Sprite.Bound.Width / 2, Sprite.Bound.Height / 2);
 
@@ -218,34 +219,6 @@ namespace Yugioh_AtemReturns.GameObjects
             }
 
             inputControls.End();
-        }
-
-        //WRAP TEXT
-        public string WrapText(SpriteFont spritefont, string text, float maxWidth)
-        {
-            string[] words = text.Split(' ');
-
-            StringBuilder stringbuilder = new StringBuilder();
-            float linewidth = 0.0f;
-            float spacewidth = spritefont.MeasureString(" ").X;
-
-            foreach (var word in words)
-            {
-                Vector2 size = spritefont.MeasureString(word);
-
-                if (linewidth + size.X < maxWidth)
-                {
-                    stringbuilder.Append(word + " ");
-                    linewidth += size.X + spacewidth;
-                }
-                else
-                {
-                    stringbuilder.Append("\n" + word + " ");
-                    linewidth = size.X + spacewidth;
-                }
-            }
-
-            return stringbuilder.ToString();
         }
     }
 }

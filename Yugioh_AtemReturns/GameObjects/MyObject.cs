@@ -103,34 +103,19 @@ namespace Yugioh_AtemReturns.GameObjects
             Sprite.Draw(_spritebatch);
         }
 
-        public virtual void MoveTo(GameTime gametime, float time, Vector2 position)
+        public virtual void AddMoveTo(MoveTo moveto)
         {
-            Sprite.MoveTo(gametime, time, position);
+            Sprite.AddMoveTo(moveto);
         }
 
-        public virtual void MoveBy(GameTime gametime, float time, Vector2 position)
+        public virtual void AddScaleTo(ScaleTo scaleto)
         {
-            Sprite.MoveBy(gametime, time, position);
+            Sprite.AddScaleTo(scaleto);
         }
 
-        public virtual void ScaleTo(GameTime gameTime, float time, Vector2 newscale)
+        public virtual void AddRotateTo(RotateTo rotateto)
         {
-            Sprite.ScaleTo(gameTime, time, newscale);
-        }
-
-        public virtual void ScaleBy(GameTime gameTime, float time, Vector2 scaleby)
-        {
-            Sprite.ScaleBy(gameTime, time, scaleby);
-        }
-
-        public virtual void RotateTo(GameTime gameTime, float time, float rotateto)
-        {
-            Sprite.RotateTo(gameTime, time, rotateto);
-        }
-
-        public virtual void RotateBy(GameTime gameTime, float time, float rotateby)
-        {
-            Sprite.RotateBy(gameTime, time, rotateby);
+            Sprite.AddRotateTo(rotateto);
         }
 
     }
