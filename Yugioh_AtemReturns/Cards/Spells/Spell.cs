@@ -25,7 +25,7 @@ namespace Yugioh_AtemReturns.Cards.Spells
             this.Original = new SpellCardData((SpellCardData)CardProvider.GetInstance().GetCardById(_spriteId.ToString()));
         }
         public Spell(ContentManager _content, string _cardId)
-            : base(_content, ID.CARD, (SpriteID)(Enum.Parse(typeof(SpriteID), "C" + _cardId)), eCardType.TRAP)
+            : base(_content, ID.CARD, (SpriteID)(Enum.Parse(typeof(SpriteID), "C" + _cardId)), eCardType.SPELL)
         {
             this.Original = new SpellCardData((SpellCardData)CardProvider.GetInstance().GetCardById("C" + _cardId));
         }

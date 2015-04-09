@@ -24,22 +24,22 @@ namespace Yugioh_AtemReturns.Cards
         public event CardHoveredEventHandle Hovered;
         public event CardHoveredEventHandle OutHovered;
 
-        protected virtual void OnLeftClick(EventArgs e)
+        public virtual void OnLeftClick(EventArgs e)
         {
             if (LeftClick != null)
                 LeftClick(this, e);
         }
-        protected virtual void OnRightClick(EventArgs e)
+        public virtual void OnRightClick(EventArgs e)
         {
             if (RightClick != null)
                 RightClick(this, e);
         }
-        protected virtual void OnHovered(EventArgs e)
+        public virtual void OnHovered(EventArgs e)
         {
             if (Hovered != null)
                 Hovered(this, e);
         }
-        protected virtual void outHovered(EventArgs e)
+        public virtual void outHovered(EventArgs e)
         {
             if (OutHovered != null)
                 OutHovered(this, e);
@@ -106,6 +106,8 @@ namespace Yugioh_AtemReturns.Cards
                 base.Status = value;
                 if (value == STATUS.DEF)
                     this.IsFaceUp = false;
+                if (value == STATUS.ATK)
+                    this.isFaceUp = true;
             }
         }
         #endregion
