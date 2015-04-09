@@ -25,9 +25,9 @@ namespace Yugioh_AtemReturns.GameObjects
         private bool isHovered = false;
         private bool isSelected = false;
         private bool isRightClick;
-        private InputController input;
+        private InputController inputController;
+
         #region Properties
-        
         public bool Selected 
         {
             get { return isSelected; }
@@ -36,6 +36,9 @@ namespace Yugioh_AtemReturns.GameObjects
                 this.Sprite = selectedImage;
             }
         }
+
+        public bool Clicked { set; get; }
+
         public bool IsRightClick
         {
             get
@@ -46,6 +49,7 @@ namespace Yugioh_AtemReturns.GameObjects
                 isRightClick = value;
             }
         }
+
         public bool Hovered {
             get { return isHovered; }
             set 
@@ -100,72 +104,28 @@ namespace Yugioh_AtemReturns.GameObjects
         
         public override void Update(GameTime gameTime)
         {
-            if (input == null)
-                input = new InputController();
+            if (inputController == null)
+                inputController = new InputController();
             base.Update(gameTime);
             //Mouse
             this.CheckMouseUpdate();
             this.UpdateProperties();
         }
 
-        //private void CheckMouseUpdate()
-        //{
-        //    InputController.getInstance().Begin(); //Begin get input
-
-
-        //    if (InputController.getInstance().IsLeftClick() && isHovered)
-        //    {
-        //        Debug.WriteLine(String.Format("{0},{1}", InputController.getInstance().MousePosition.X, InputController.getInstance().MousePosition.Y));
-        //        this.isSelected = true;
-        //        this.DoButtonEvent();
-        //    }
-        //    else if (InputController.getInstance().IsLeftClick() && !isHovered)
-        //    {
-        //        this.isSelected = false;
-        //    }
-
-
-        //    if (this.Sprite.Bound.Contains(InputController.getInstance().MousePosition) && !isHovered)
-        //    {
-        //        Debug.WriteLine("hovered!");
-        //        if (hoverImage != null)
-        //        {
-        //            this.Sprite = hoverImage;
-        //        }
-        //        isHovered = true;
-        //    }
-        //    if (!this.Sprite.Bound.Contains(InputController.getInstance().MousePosition))
-        //    {
-        //        isHovered = false;
-        //        if (normalImage != null)
-        //        {
-        //            this.Sprite = normalImage;
-        //        }
-        //        //Debug.WriteLine("no hovered!");
-        //        //Debug.WriteLine(Convert.ToString(InputController.getInstance().MousePosition.X) + " " +Convert.ToString(InputController.getInstance().MousePosition.Y));
-        //    }
-            
-        //    if(isSelected)
-        //    {
-        //        if (selectedImage != null)
-        //        {
-        //            this.Sprite = selectedImage;
-        //        }
-        //    }
-
-        //    InputController.getInstance().End(); //End get input
-        //}
         private void CheckMouseUpdate()
         {
-            input.Begin(); //Begin get input
+            inputController.Begin(); //Begin get inputController
 
+            this.Clicked = false;
 
-            if (input.IsLeftClick())
+            //LEFT CLICK
+            if (inputController.IsLeftClick())
             {
                 if (isHovered)
                 {
-                    Debug.WriteLine(String.Format("{0},{1}", input.MousePosition.X, input.MousePosition.Y));
+                    Debug.WriteLine(String.Format("{0},{1}", inputController.MousePosition.X, inputController.MousePosition.Y));
                     this.isSelected = true;
+                    this.Clicked = true;
                     this.DoButtonEvent();
                 }
                 else
@@ -174,7 +134,8 @@ namespace Yugioh_AtemReturns.GameObjects
                 }
             }
 
-            if (input.IsRightLick())
+            //RIGHT CLICK
+            if (inputController.IsRightLick())
             {
                 if (isHovered)
                 {
@@ -187,7 +148,7 @@ namespace Yugioh_AtemReturns.GameObjects
                 }
             }
 
-            if (this.Sprite.Bound.Contains(input.MousePosition) && !isHovered)
+            if (this.Sprite.Bound.Contains(inputController.MousePosition) && !isHovered)
             {
                 Debug.WriteLine("hovered!");
                 if (hoverImage != null)
@@ -196,7 +157,7 @@ namespace Yugioh_AtemReturns.GameObjects
                 }
                 isHovered = true;
             }
-            if (!this.Sprite.Bound.Contains(input.MousePosition))
+            if (!this.Sprite.Bound.Contains(inputController.MousePosition))
             {
                 isHovered = false;
                 if (normalImage != null)
@@ -213,7 +174,7 @@ namespace Yugioh_AtemReturns.GameObjects
                 }
             }
 
-            input.End(); //End get input
+            inputController.End(); //End get inputController
         }
         public event Action ButtonEvent;
         public event Action RightClick;
@@ -227,6 +188,7 @@ namespace Yugioh_AtemReturns.GameObjects
             if (RightClick != null)
                 RightClick();
         }
+
         private void UpdateProperties()
         {
             if (normalImage != null && Sprite != null)

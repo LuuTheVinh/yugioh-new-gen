@@ -30,17 +30,18 @@ namespace Yugioh_AtemReturns.GameObjects
         private float m_Timer = 0;
         //for Transforms
         private Vector2 m_oldPosition;                                              //Move
-        private bool isMoveDone = true;                                     
         private Vector2 m_Velocity;                                     
-        private float m_moveDistance;
-        private bool isScaleDone = true;                                            //Scale
+        private float m_moveDistance;                                               //Scale
         private Vector2 speedScale;
         private float scaleRatio;
-        private float scaleValue;
-        private bool isRotateDone = true;                                           //Rotate
+        private float scaleValue;                                                   //Rotate
         private float oldRotation;
         private float rotateValue;
         private float speedRotate;
+        //
+        private List<MoveTo> _moveList = new List<MoveTo>();
+        private List<RotateTo> _rotateList = new List<RotateTo>();
+        private List<ScaleTo> _scaleList = new List<ScaleTo>(); 
         #endregion
         
         #region Properties
@@ -98,6 +99,7 @@ namespace Yugioh_AtemReturns.GameObjects
             get { return m_rotation; }
             set { m_rotation = value; }
         }
+
         public SpriteEffects Effect
         {
             get { return m_effect; }
@@ -106,11 +108,13 @@ namespace Yugioh_AtemReturns.GameObjects
         public Rectangle Frame
         {
             get { return m_Frame; }
-            set { m_Frame = value;
-            this.MaxFrameH = this.m_texture.Height / value.Height;
-            this.MaxFrameW = this.m_texture.Width / value.Width;
-            this.m_Bound.Width = value.Width;
-            this.m_Bound.Height = value.Height;
+            set 
+            { 
+                m_Frame = value;
+                this.MaxFrameH = this.m_texture.Height / value.Height; 
+                this.MaxFrameW = this.m_texture.Width / value.Width; 
+                this.m_Bound.Width = value.Width; 
+                this.m_Bound.Height = value.Height;
             }
         }
         public int CurFrameW
@@ -157,10 +161,6 @@ namespace Yugioh_AtemReturns.GameObjects
             get { return m_Bound; }
             set { m_Bound = value; }
         }
-
-        public bool IsDone {
-            get { return (isMoveDone && isScaleDone); } 
-        }
         #endregion
 
         public Sprite(ContentManager contentManager, String address)
@@ -200,9 +200,9 @@ namespace Yugioh_AtemReturns.GameObjects
             return contentManager.Load<Texture2D>(address);
         }
 
-        public void Draw(SpriteBatch _spritebatch)
+        public void Draw(SpriteBatch spritebatch)
         {
-            _spritebatch.Draw(
+            spritebatch.Draw(
                 Texture,
                 Position,
                 Frame,
@@ -217,15 +217,68 @@ namespace Yugioh_AtemReturns.GameObjects
 
         public virtual void Update(GameTime gameTime)
         {
-            
+            //THỰC HIỆN TỪNG CÁI ANIMATION TRONG CÁC LIST
+            //MOVE TO
+            if (_moveList.Any())
+            {
+                var first = _moveList.First();
+                
+                if (!_moveList.First().IsDone)
+                {
+                    this.RunMoveTo(ref first);
+                }
+                else if (_moveList.First().IsDone)
+                {
+                    _moveList.Remove(_moveList.First());
+                }
+            }
+
+            //ROTATE TO
+            if (_rotateList.Any())
+            {
+                var first = _rotateList.First();
+
+                if (!_rotateList.First().IsDone)
+                {
+                    this.RunRotateTo(ref first);
+                }
+                else if (_rotateList.First().IsDone)
+                {
+                    _rotateList.Remove(_rotateList.First());
+                }
+            }
+
+            //SCALE TO
+            if (_scaleList.Any())
+            {
+                var first = _scaleList.First();
+
+                if (!_scaleList.First().IsDone)
+                {
+                    this.RunScaleTo(ref first);
+                }
+                else if (_scaleList.First().IsDone)
+                {
+                    _scaleList.Remove(_scaleList.First());
+                }
+            }
         }
 
         #region Sprite Transforms
-        public void MoveTo(GameTime gameTime, float time, Vector2 nextposition)
+
+        public virtual void AddMoveTo(MoveTo moveto)
         {
-            if(isMoveDone)
+            _moveList.Add(moveto);
+        }
+
+        private void RunMoveTo(ref MoveTo moveto)
+        {
+            float time = moveto.Time;
+            Vector2 nextposition = moveto.NextPosition;
+
+            if(!moveto.IsDoing)
             {
-                isMoveDone = false;
+                moveto.IsDoing = true;
                 var velocityX = (nextposition.X - Position.X) / (time * 60); //60 là fps
                 var velocityY = (nextposition.Y - Position.Y) / (time * 60);
                 m_Velocity = new Vector2(velocityX, velocityY);
@@ -240,7 +293,7 @@ namespace Yugioh_AtemReturns.GameObjects
             var distance = (float)Math.Sqrt(((Position.X - m_oldPosition.X) * (Position.X - m_oldPosition.X) +
                                         (Position.Y - m_oldPosition.Y) * (Position.Y - m_oldPosition.Y)));
             
-            if (m_moveDistance >= distance && !isMoveDone)
+            if (m_moveDistance > distance && !moveto.IsDone)
             {
                 //Kiểm tra lần di chuyển cuối cùng có vượt ra khỏi vị trí đích hay không
                 if ((float)Math.Sqrt(m_Velocity.X * m_Velocity.X + m_Velocity.Y * m_Velocity.Y) > (m_moveDistance - distance))
@@ -253,21 +306,26 @@ namespace Yugioh_AtemReturns.GameObjects
             }
             else
             {
-                isMoveDone = true;
+                moveto.IsDone = true;
+                moveto.IsDoing = false;
                 m_oldPosition = Position;
             }
         }
-        
-        public void MoveBy(GameTime gameTime, float time, Vector2 distance)
-        {
-            var nextposition = Position + distance;
-            MoveTo(gameTime, time, nextposition);
-        }
 
-        public void ScaleTo(GameTime gameTime, float time, Vector2 newscale)
+        public virtual void AddScaleTo(ScaleTo scaleto)
         {
-            if(isScaleDone)
+            
+            _scaleList.Add(scaleto);
+        }
+        
+        private void RunScaleTo(ref ScaleTo scaleto)
+        {
+            float time = scaleto.Time;
+            Vector2 newscale = scaleto.NextScale;
+
+            if(!scaleto.IsDoing)
             {
+                scaleto.IsDoing = true;
                 speedScale.X = (newscale.X - Scale.X) / (time * 60);
                 speedScale.Y = (newscale.Y - Scale.Y) / (time * 60);
 
@@ -275,13 +333,11 @@ namespace Yugioh_AtemReturns.GameObjects
                                              (newscale.X - Scale.X) * (newscale.X - Scale.X) +
                                              (newscale.Y - Scale.Y) * (newscale.Y - Scale.Y)
                                              );
-
-                isScaleDone = false;
             }
 
             scaleValue += (float)Math.Sqrt(speedScale.X * speedScale.X + speedScale.Y*speedScale.Y);
 
-            if(scaleRatio >= scaleValue && !isScaleDone)
+            if(scaleRatio > scaleValue && !scaleto.IsDone)
             {
                 if((Math.Abs(Scale.X - newscale.X) < speedScale.X) && (Math.Abs(Scale.Y - newscale.Y) < speedScale.Y))
                 {
@@ -292,21 +348,24 @@ namespace Yugioh_AtemReturns.GameObjects
             }
             else
             {
-                isScaleDone = true;
+                scaleto.IsDone = true;
+                scaleto.IsDoing = false;
             }
         }
 
-        public void ScaleBy(GameTime gameTime, float time, Vector2 scaleby)
+        public virtual void AddRotateTo(RotateTo rotateto)
         {
-            Vector2 newscale = Scale + scaleby;
-            ScaleTo(gameTime, time, newscale);
+            _rotateList.Add(rotateto);
         }
 
-        public void RotateTo(GameTime gameTime, float time, float rotateto)
+        private void RunRotateTo(ref RotateTo newrotation)
         {
-            if (isRotateDone)
+            float time = newrotation.Time;
+            float rotateto = newrotation.NextRotation * (float)Math.PI / 180;
+
+            if (!newrotation.IsDoing)
             {
-                isRotateDone = false;
+                newrotation.IsDoing = true;
                 oldRotation = Rotation;
                 speedRotate = (rotateto - Rotation) / (time * 60);
                 rotateValue = rotateto - Rotation;
@@ -314,7 +373,7 @@ namespace Yugioh_AtemReturns.GameObjects
 
             float rotated = Rotation - oldRotation;
 
-            if (rotateValue >= rotated && !isRotateDone)
+            if (rotateValue > rotated && !newrotation.IsDone)
             {
                if(Math.Abs(rotateto - rotated) < speedRotate)
                {
@@ -324,14 +383,9 @@ namespace Yugioh_AtemReturns.GameObjects
             }
             else
             {
-                isRotateDone = true;
+                newrotation.IsDone = true;
+                newrotation.IsDoing = false;
             }
-        }
-
-        public void RotateBy(GameTime gameTime, float time, float rotateby)
-        {
-            var rotateto = Rotation + rotateby;
-            RotateTo(gameTime, time, rotateto);
         }
 
         #endregion

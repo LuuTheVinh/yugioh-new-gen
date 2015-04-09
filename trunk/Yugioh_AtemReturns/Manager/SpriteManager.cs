@@ -50,7 +50,7 @@ namespace Yugioh_AtemReturns.Manager
             for (int i = 0; i < Enum.GetValues(typeof(SpriteID)).Length; i++)//lấy tất cả enum để load file hình. nếu không tìm thấy thì bỏ qua
             {
                 _listSprite.Add(
-                     new Sprite(_content,this.getFormatFileName((SpriteID)i))); 
+                     new Sprite(_content,this.getFormatFileName((SpriteID)i)));
 					 // Đoạn này đặt đường dẫn đơn giản nên ràng buộc tất cả hình phải cùng để trong thự mục content
 					 // Nếu muốn đặt hình trong thư mục khác thì sửa lại đường dẫn
 					 // Nếu muốn đặt các hình ở thư mục khác nhau thì quy ước lấy một vài chữ cái đầu của thư mục làm các chữ cái đầu của IDictionary
@@ -67,6 +67,12 @@ namespace Yugioh_AtemReturns.Manager
             {
                 return ("phase\\" + _id.ToString());
             }
+
+            if(_id.ToString().StartsWith("B")) //Card Big
+            {
+                return ("card_big\\" + _id.ToString().Substring(1));
+            }
+
             return _id.ToString();
         }
     }

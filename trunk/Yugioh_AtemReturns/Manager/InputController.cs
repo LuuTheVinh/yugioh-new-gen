@@ -52,6 +52,14 @@ namespace Yugioh_AtemReturns.Manager
             return result;
         }
 
+        public bool IsLeftRelease()
+        {
+            this.checkBegin();
+            bool result = oldMouse.LeftButton == ButtonState.Released;
+
+            return result;
+        }
+
         public bool IsRightLick()
         {
             this.checkBegin();
@@ -103,6 +111,14 @@ namespace Yugioh_AtemReturns.Manager
             get
             {
                 return new Point(Mouse.GetState().X, Mouse.GetState().Y);
+            }
+        }
+
+        public int DeltaScrollWheelValue
+        {
+            get
+            {
+                return newMouse.ScrollWheelValue - oldMouse.ScrollWheelValue;
             }
         }
 
