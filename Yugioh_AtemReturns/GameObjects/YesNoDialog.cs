@@ -109,6 +109,8 @@ namespace Yugioh_AtemReturns.GameObjects
 
         public override void Update(GameTime gameTime)
         {
+            if (this.IsShow == false)
+                return; //
             base.Update(gameTime);
             UpdateChangedValues();
             yesButton.Update(gameTime);
@@ -179,7 +181,11 @@ namespace Yugioh_AtemReturns.GameObjects
         {
             IsShow = true;
         }
-
+        public void Show(string _message)
+        {
+            IsShow = true;
+            this.MessageText = _message;
+        }
         public void Hide()
         {
             IsShow = false;

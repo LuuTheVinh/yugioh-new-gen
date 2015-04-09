@@ -94,5 +94,23 @@ namespace Yugioh_AtemReturns {
                 return ((global::Microsoft.Xna.Framework.Vector2)(this["FieldSlot"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("220, 66")]
+        public global::Microsoft.Xna.Framework.Vector2 Phase {
+            get {
+                return ((global::Microsoft.Xna.Framework.Vector2)(this["Phase"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0, 80")]
+        public global::Microsoft.Xna.Framework.Vector2 PhaseSpace {
+            get {
+                return ((global::Microsoft.Xna.Framework.Vector2)(this["PhaseSpace"]));
+            }
+        }
     }
 }
