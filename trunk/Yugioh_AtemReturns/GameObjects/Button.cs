@@ -55,7 +55,22 @@ namespace Yugioh_AtemReturns.GameObjects
                 this.Sprite = hoverImage;
             }
         }
+        public Sprite NormalImage { get { return normalImage; } }
+        public Sprite SelectedImage
+        {
+            get
+            {
+                return (selectedImage == null) ? normalImage : selectedImage;
+            }
+        }
 
+        public Sprite HoverImage
+        {
+            get
+            {
+                return (hoverImage == null) ? normalImage : hoverImage;
+            }
+        }
         #endregion
 
         public Button(Sprite image)

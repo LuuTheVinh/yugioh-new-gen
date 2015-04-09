@@ -26,5 +26,11 @@
     <Setting Name="FieldSlot" Type="Microsoft.Xna.Framework.Vector2" Scope="Application">
       <Value Profile="(Default)">78, 100</Value>
     </Setting>
+    <Setting Name="Phase" Type="Microsoft.Xna.Framework.Vector2" Scope="Application">
+      <Value Profile="(Default)">220, 66</Value>
+    </Setting>
+    <Setting Name="PhaseSpace" Type="Microsoft.Xna.Framework.Vector2" Scope="Application">
+      <Value Profile="(Default)">0, 80</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

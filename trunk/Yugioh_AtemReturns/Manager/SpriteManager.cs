@@ -63,6 +63,10 @@ namespace Yugioh_AtemReturns.Manager
             {
                 return ("card\\"+_id.ToString().Substring(1) );
             }
+            if (_id.ToString().StartsWith("pha")) // quy ước các hình các lá bài bắt đầu bằng chữ C nên đừng sử dụng chữ c cho cái khác nữa
+            {
+                return ("phase\\" + _id.ToString());
+            }
             return _id.ToString();
         }
     }

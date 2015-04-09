@@ -106,7 +106,12 @@ namespace Yugioh_AtemReturns.GameObjects
         public Rectangle Frame
         {
             get { return m_Frame; }
-            set { m_Frame = value; }
+            set { m_Frame = value;
+            this.MaxFrameH = this.m_texture.Height / value.Height;
+            this.MaxFrameW = this.m_texture.Width / value.Width;
+            this.m_Bound.Width = value.Width;
+            this.m_Bound.Height = value.Height;
+            }
         }
         public int CurFrameW
         {
