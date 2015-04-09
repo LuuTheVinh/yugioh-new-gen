@@ -14,12 +14,18 @@ namespace Yugioh_AtemReturns.Duelists
     {
         protected Deck[] duelDisk;
         protected Transfer transfer;
-
+        protected int m_maxNormalSummon;
+        protected int m_CurNormalSummon;
+        #region Property
         public Transfer Transfer
         {
             get { return transfer; }
             protected set { transfer = value; }
         }
+    
+        public bool isTurn;
+
+        public ePhase Phase;
 
         public MainDeck MainDeck
         {
@@ -47,6 +53,19 @@ namespace Yugioh_AtemReturns.Duelists
             get { return duelDisk; }
             protected set {duelDisk = value;}
         }
+
+        public int MaxNormalSummon
+        {
+            get { return m_maxNormalSummon; }
+            set { m_maxNormalSummon = value; }
+        }
+        public int CurNormalSummon
+        {
+            get { return m_CurNormalSummon; }
+            set { m_CurNormalSummon = value; }
+    }
+        #endregion // property
+
         //test
 
         public Duelist(ePlayerId _id)
@@ -73,10 +92,11 @@ namespace Yugioh_AtemReturns.Duelists
 
         public virtual void Init()
         {
-
+            this.MaxNormalSummon = 1;
+            this.CurNormalSummon = this.MaxNormalSummon;
         }
 
-        public virtual void IntiMainDeck(ContentManager _content)
+        public virtual void Init(ContentManager _content)
         {
         }
 
