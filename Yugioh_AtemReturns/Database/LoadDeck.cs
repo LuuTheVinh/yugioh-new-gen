@@ -33,7 +33,6 @@ namespace Yugioh_AtemReturns.Database
 
             this.adapterManager.DeckInfoTableAdapter = this.deckInfoTableAdapter;
             this.adapterManager.DataSourceTableAdapter = this.dataSourceTableAdapter;
-
             this.deckInfoTableAdapter.Fill(dataset.DeckInfo);
             this.dataSourceTableAdapter.Fill(dataset.DataSource);
         }
@@ -49,7 +48,7 @@ namespace Yugioh_AtemReturns.Database
             
             this.deckInfo = this.deckInfoTableAdapter.FindByDeckId(_deckId);
             Yugioh_AtemReturns.Database.CardSourceDataSet.DataSourceRow temp;
-
+            _listcard = new LinkedList<Card>();
             for (int i = 0; i < deckInfo.Rows.Count; i++)
             {
                 temp = dataset.DataSource.FindById(Convert.ToString(deckInfo[i].CardId));
