@@ -10,17 +10,22 @@ namespace Yugioh_AtemReturns
 
     public enum SpriteID
     {
+        CBackSide,
         C1002,
         C1003,
         C3005,
         C83764719,
-        CBackSide,
+        C11549357, C13039848, C25652259, C28279543, C38033122,
+        C39256679, C40640057, C41392891, C46986415, C52077741,
+        C57116034, C5818798, C64788463, C65240384, C70781052,
+        C71413901, C72989439, C75347539, C78193831, C87796900,
+        C90876561, C91152256, C95727991, C99785935,
 
-        BBackSide
+        BBackSide,
         pha_b_ba, pha_b_dr, pha_b_en, pha_b_m1, pha_b_m2,pha_b_st,
         pha_r_ba, pha_r_dr, pha_r_en, pha_r_m1, pha_r_m2, pha_r_st,
         pha_s_ba, pha_s_dr, pha_s_en, pha_s_m1, pha_s_m2, pha_s_st,
-        detail
+
     }
 
     public enum ID
