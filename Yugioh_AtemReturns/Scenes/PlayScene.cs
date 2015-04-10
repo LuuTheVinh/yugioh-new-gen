@@ -20,7 +20,7 @@ namespace Yugioh_AtemReturns.Scenes
         private Player player;
         private Computer computer;
 
-        Sprite _detail;
+        //Sprite _detail;
         private PhaseSelector phaseSelector;
         public override void Init(Game _game)
         {
@@ -38,7 +38,7 @@ namespace Yugioh_AtemReturns.Scenes
             player.isTurn = true;
             computer.isTurn = false;
 
-            _detail = new Sprite(SpriteManager.getInstance(_game.Content).GetSprite(SpriteID.detail));
+            //_detail = new Sprite(SpriteManager.getInstance(_game.Content).GetSprite(SpriteID.detail));
 
             YNDialog = new YesNoDialog(_game.Content, "String");
             YNDialog.Position = new Vector2(
@@ -87,7 +87,7 @@ namespace Yugioh_AtemReturns.Scenes
 
             base.Draw(_spriteBatch);
             background.Draw(_spriteBatch);
-            _detail.Draw(_spriteBatch);
+            //_detail.Draw(_spriteBatch);
             this.phaseSelector.Draw(_spriteBatch);
             //test0.Draw(spriteBatch);
             _spriteBatch.End();
