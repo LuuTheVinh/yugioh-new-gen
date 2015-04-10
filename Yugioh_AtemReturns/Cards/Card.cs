@@ -6,6 +6,11 @@ using Microsoft.Xna.Framework.Content;
 using Yugioh_AtemReturns.GameObjects;
 using Yugioh_AtemReturns.Manager;
 using Microsoft.Xna.Framework;
+using Yugioh_AtemReturns.Cards.Monsters;
+using Yugioh_AtemReturns.Cards.Traps;
+using Yugioh_AtemReturns.Cards.Spells;
+using Yugioh_AtemReturns.Scenes;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Yugioh_AtemReturns.Cards
 {
@@ -13,12 +18,11 @@ namespace Yugioh_AtemReturns.Cards
     delegate void CardHoveredEventHandle(Card sender, EventArgs e);
     abstract class Card : MyObject
     {
-        public Sprite s_BackSide = null;
 
         private eCardType cardType;
         private bool isFaceUp;
         private Button button;
-
+        
         public event CardLeftClickEventHandle LeftClick;
         public event CardLeftClickEventHandle RightClick;
         public event CardHoveredEventHandle Hovered;
@@ -48,49 +52,23 @@ namespace Yugioh_AtemReturns.Cards
         public bool IsFaceUp
         {
             get { return isFaceUp; }
-            set { isFaceUp = value; }
+            set 
+            {
+                if (value == true)
+                {
+                    this.Sprite.Texture = this.m_frontsideTexture;
+                }
+                else
+                {
+                    this.Sprite.Texture = this.m_backsideTexture;
+                }
+                isFaceUp = value; 
+            }
         }
         public eCardType CardType
         {
             get { return cardType; }
             set { cardType = value; }
-        }
-
-        public Vector2 POSITION
-        {
-            get { return base.Sprite.Position; }
-            set
-            {
-                base.Sprite.Position = value;
-                this.s_BackSide.Position = value;
-            }
-        }
-        public Vector2 SCALE
-        {
-            get { return Sprite.Scale; }
-            set
-            {
-                Sprite.Scale = value;
-                s_BackSide.Scale = value;
-            }
-        }
-        public  float ROTATION
-        {
-            get { return Sprite.Rotation; }
-            set
-            {
-                Sprite.Rotation = value;
-                s_BackSide.Rotation = value;
-            }
-        }
-        public Vector2 ORIGIN
-        {
-            get { return Sprite.Origin; }
-            set
-            {
-                Sprite.Origin = value;
-                s_BackSide.Origin = value;
-            }
         }
 
         public Button Button
@@ -107,32 +85,33 @@ namespace Yugioh_AtemReturns.Cards
                 if (value == STATUS.DEF)
                     this.IsFaceUp = false;
                 if (value == STATUS.ATK)
-                    this.isFaceUp = true;
+                    this.IsFaceUp = true;
             }
         }
         #endregion
+        private Texture2D m_backsideTexture;
+        private Texture2D m_frontsideTexture;
         public Card(ContentManager _content, ID _id, SpriteID _spriteId, eCardType _cardType)
             : base(_content, _id, _spriteId)
         {
-            this.s_BackSide = new Sprite(SpriteManager.getInstance(_content).GetSprite(SpriteID.CBackSide));
+            m_backsideTexture = SpriteManager.getInstance(_content).GetTexture(SpriteID.CBackSide);
+            m_frontsideTexture = SpriteManager.getInstance(_content).GetTexture(_spriteId); 
             this.IsFaceUp = true;
             this.CardType = _cardType;
             this.Button = new Button(this.Sprite);
             this.Button.Position = this.Position;
             this.Button.ButtonEvent += new Action(Button_DoActionClick);
             this.Button.RightClick += new Action(Button_OnRightClick);
+            this.Hovered += new CardHoveredEventHandle(Card_Hovered); 
         }
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch _spritebatch)
         {
-            if (this.IsFaceUp == true)
-                base.Draw(_spritebatch);
-            else
-                this.s_BackSide.Draw(_spritebatch);
+            base.Draw(_spritebatch);
         }
         public override void Update(GameTime gameTime)
         {
-            
+            base.Update(gameTime);
             this.Button.Update(gameTime);
 
             if (this.Button.Hovered)
@@ -145,6 +124,26 @@ namespace Yugioh_AtemReturns.Cards
             }
         }
 
+        public override string ToString()
+        {
+            switch (this.CardType)
+            {
+                case eCardType.MONSTER:
+                    return (this as Monster).Original.Id.ToString();
+                case eCardType.TRAP:
+                    return (this as Trap).Original.Id.ToString();
+                case eCardType.SPELL:
+                    return (this as Spell).Original.Id.ToString();
+                case eCardType.XYZ:
+                    throw new Exception("Chua dinh nghia Xyz monster");
+                case eCardType.SYNCHRO:
+                    throw new Exception("Chua dinh nghia Synchro monster");
+                case eCardType.FUSION:
+                    throw new Exception("Chua dinh nghia Fusion monster");
+                default:
+                    return String.Empty ;
+            }
+        }
         private void Button_DoActionClick()
         {
             this.OnLeftClick(EventArgs.Empty);
@@ -152,6 +151,13 @@ namespace Yugioh_AtemReturns.Cards
         private void Button_OnRightClick()
         {
             this.OnRightClick(EventArgs.Empty);
+        }
+        private void Card_Hovered(Card sender, EventArgs e)
+        {
+            if (sender.IsFaceUp)
+                PlayScene.DetailSideBar.SetCardPreview(sender.ToString());
+            else
+                PlayScene.DetailSideBar.SetDefaultCardPreview();
         }
     }
 }

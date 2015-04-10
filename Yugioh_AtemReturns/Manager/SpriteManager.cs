@@ -44,7 +44,17 @@ namespace Yugioh_AtemReturns.Manager
 				throw new Exception("Id: \'" + _id + "\' is not exists");
 			}
         }
-
+        public Texture2D GetTexture(SpriteID _id)
+        {
+            try
+            {
+                return _listSprite[(int)_id].Texture;
+            }
+            catch
+            {
+                throw new Exception("Id: \'" + _id + "\' is not exists");
+            }
+        }
         private void LoadContent(ContentManager _content)
         {
             for (int i = 0; i < Enum.GetValues(typeof(SpriteID)).Length; i++)//lấy tất cả enum để load file hình. nếu không tìm thấy thì bỏ qua
