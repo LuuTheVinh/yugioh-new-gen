@@ -7,11 +7,30 @@ using Yugioh_AtemReturns.Decks;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Yugioh_AtemReturns.Cards;
 
 namespace Yugioh_AtemReturns.Duelists
 {
+    enum ePhase
+    {
+        STARTUP, STANDBY, DRAW, MAIN1, BATTLE, MAIN2, END,
+        TEST
+    }
+    enum ePlayerStatus
+    {
+        IDLE,
+        WAITFORTRIBUTE,
+        SUMONNING
+    }
+    enum eBuffer
+    {
+        MONSTERSUMMON
+    }
     class Duelist
     {
+        protected Card m_summonBuffer;
+        protected ePlayerStatus m_status;
+
         protected Deck[] duelDisk;
         protected Transfer transfer;
         protected int m_maxNormalSummon;
@@ -24,7 +43,17 @@ namespace Yugioh_AtemReturns.Duelists
         }
     
         public bool isTurn;
-
+        public Card SummonBuffer
+        {
+            get
+            {
+                return m_summonBuffer;
+            }
+            set
+            {
+                m_summonBuffer = value;
+            }
+        }
         public ePhase Phase;
 
         public MainDeck MainDeck

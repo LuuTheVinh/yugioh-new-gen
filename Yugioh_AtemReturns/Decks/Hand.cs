@@ -20,7 +20,6 @@ namespace Yugioh_AtemReturns.Decks
             get { return m_maxCard; }
             set { m_maxCard = value; }
         }
-
         public Hand(ePlayerId _id)
             : base(_id,eDeckId.HAND)
         {

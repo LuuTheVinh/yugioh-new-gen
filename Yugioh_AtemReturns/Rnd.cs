@@ -17,6 +17,8 @@ namespace Yugioh_AtemReturns
 
         public static int Rand(int min, int max)
         {
+            if (min == max)
+                return min;
             if (rngCspRand == null)
                 rngCspRand = new RNGCryptoServiceProvider();
             if ((max - min + 1) < byte.MaxValue)

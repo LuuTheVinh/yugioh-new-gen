@@ -70,7 +70,7 @@ namespace Yugioh_AtemReturns.Duelists {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("765, 45")]
+        [global::System.Configuration.DefaultSettingValueAttribute("765, 30")]
         public global::Microsoft.Xna.Framework.Vector2 Hand {
             get {
                 return ((global::Microsoft.Xna.Framework.Vector2)(this["Hand"]));

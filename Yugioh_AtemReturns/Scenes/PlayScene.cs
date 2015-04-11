@@ -17,11 +17,14 @@ namespace Yugioh_AtemReturns.Scenes
         //MainDeck maindeck;
         private Sprite background;
         //Yugioh_AtemReturns.Cards.Traps.Trap test0;
-        private Player player;
-        private Computer computer;
+        public static Player Player;
+        public static Computer Computer;
 
         //Sprite _detail;
         private PhaseSelector phaseSelector;
+
+        RasterizerState _rasterizerState;
+        public static DetailSideBar DetailSideBar;
         public override void Init(Game _game)
         {
             base.Init(_game);
@@ -29,14 +32,14 @@ namespace Yugioh_AtemReturns.Scenes
             background.Position = new Vector2(230, 0);
             background.Depth = 0.0f;
 
-            player = new Player();
-            player.Init(Game.Content);
+            Player = new Player();
+            Player.Init(Game.Content);
 
-            computer = new Computer();
-            computer.Init(Game.Content);
+            Computer = new Computer();
+            Computer.Init(Game.Content);
 
-            player.isTurn = true;
-            computer.isTurn = false;
+            Player.isTurn = true;
+            Computer.isTurn = false;
 
             //_detail = new Sprite(SpriteManager.getInstance(_game.Content).GetSprite(SpriteID.detail));
 
@@ -49,6 +52,9 @@ namespace Yugioh_AtemReturns.Scenes
             phaseSelector.EndPhaseButton.ButtonEvent += new Action(EndPhaseButton_ButtonEvent);
             phaseSelector.Main2Button.ButtonEvent += new Action(Main2Button_ButtonEvent);
             phaseSelector.BattleButton.ButtonEvent += new Action(BattleButton_ButtonEvent);
+
+            _rasterizerState = new RasterizerState() { ScissorTestEnable = true };
+            DetailSideBar = new DetailSideBar(_game.Content);
         }
         public override void Update(GameTime _gameTime)
         {
@@ -57,43 +63,49 @@ namespace Yugioh_AtemReturns.Scenes
             base.Update(_gameTime);
 
             YNDialog.Update(_gameTime); 
-            if (player.isTurn == true)
+            if (Player.isTurn == true)
             {
-                this.player.Update(_gameTime);
-                this.computer.Update(_gameTime);
-                if (player.isTurn == false)
+                Player.Update(_gameTime);
+                Computer.Update(_gameTime);
+                if (Player.isTurn == false)
                 {
-                    computer.isTurn = true;
+                    Computer.isTurn = true;
                 }
             }
             else
             {
-                this.player.Update(_gameTime);
-                this.computer.Update(_gameTime);
-                if (computer.isTurn == false)
+                Player.Update(_gameTime);
+                Computer.Update(_gameTime);
+                if (Computer.isTurn == false)
                 {
-                    player.isTurn = true;
+                    Player.isTurn = true;
                 }
             }
-            if (this.player.Status == ePlayerStatus.IDLE)
+            if (Player.Status == ePlayerStatus.IDLE)
                 this.phaseSelector.Update(_gameTime);
-            this.phaseSelector.UpdateButton(this.player);
+            this.phaseSelector.UpdateButton(Player);
+            DetailSideBar.Update(_gameTime);
         }
 
         public override void Draw(SpriteBatch _spriteBatch)
         {
 
-            _spriteBatch.Begin();
+       //     _spriteBatch.Begin();
+
+            _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend,
+                      null, null, _rasterizerState);
+
 
             base.Draw(_spriteBatch);
             background.Draw(_spriteBatch);
-            //_detail.Draw(_spriteBatch);
+
+            DetailSideBar.Draw(_spriteBatch);
             this.phaseSelector.Draw(_spriteBatch);
-            //test0.Draw(spriteBatch);
             _spriteBatch.End();
 
-            player.Draw(_spriteBatch);
-            computer.Draw(_spriteBatch);
+
+            Player.Draw(_spriteBatch);
+            Computer.Draw(_spriteBatch);
 
             _spriteBatch.Begin();
             PlayScene.YNDialog.Draw(_spriteBatch);
@@ -105,19 +117,19 @@ namespace Yugioh_AtemReturns.Scenes
         #region Phase
         private void EndPhaseButton_ButtonEvent()
         {
-            this.player.Phase = ePhase.END;
+            Player.Phase = ePhase.END;
         }
         private void Main2Button_ButtonEvent()
         {
-            if (this.player.Phase == ePhase.BATTLE)
-                this.player.Phase = ePhase.MAIN2;
+            if (Player.Phase == ePhase.BATTLE)
+                Player.Phase = ePhase.MAIN2;
         }
         private void BattleButton_ButtonEvent()
         {
-            foreach (var item in player.MonsterField.ListCard)
+            foreach (var item in Player.MonsterField.ListCard)
             {
                 if (item.STATUS == STATUS.ATK)
-                    this.player.Phase = ePhase.BATTLE;
+                    Player.Phase = ePhase.BATTLE;
             }
 
         }

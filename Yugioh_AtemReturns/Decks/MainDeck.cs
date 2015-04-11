@@ -42,8 +42,10 @@ namespace Yugioh_AtemReturns.Decks
         {
             this.ListCard = LoadDeck.GetInstance().GetDeck(_content, _deckId);
             this.Shuffle();
-            if (ListCard.Count != 0)
-                this.Sprite = ListCard.First.Value.s_BackSide;
+            
+            //if (ListCard.Count != 0)
+            //    this.Sprite = ListCard.First.Value.s_BackSide;
+            this.Sprite = new Sprite(SpriteManager.getInstance(_content).GetSprite(SpriteID.CBackSide));
         }
 
         public override void Draw(SpriteBatch spritebatch)
@@ -53,8 +55,8 @@ namespace Yugioh_AtemReturns.Decks
             spritebatch.Begin();
             if (ListCard.Count != 0)
             {
-                if (Sprite != null)
-                    this.Sprite = ListCard.First.Value.s_BackSide;
+                //if (Sprite != null)
+                //    this.Sprite = ListCard.First.Value.s_BackSide;
                 for (int i = 0; i <= Math.Min(ListCard.Count / 2, 20); i++)
                 {
                     spritebatch.Draw(

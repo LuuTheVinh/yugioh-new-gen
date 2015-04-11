@@ -56,6 +56,19 @@ namespace Yugioh_AtemReturns.Decks
             if (CardRemoved != null)
                 CardRemoved(this, e);
         }
+
+        public bool IsAction
+        {
+            get
+            {
+                foreach (var item in ListCard)
+                {
+                    if (item.IsAction == true)
+                        return true;
+                }
+                return false;
+            }
+        }
         #region Property
         public Vector2 Position
         {

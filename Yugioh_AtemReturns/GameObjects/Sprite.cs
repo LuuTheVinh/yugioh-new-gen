@@ -43,13 +43,20 @@ namespace Yugioh_AtemReturns.GameObjects
         private List<RotateTo> _rotateList = new List<RotateTo>();
         private List<ScaleTo> _scaleList = new List<ScaleTo>(); 
         #endregion
-        
+
+
+        public bool IsAction
+        {
+            get {
+                return (_moveList.Any() || _rotateList.Any() || _scaleList.Any());
+                }
+        }//
         #region Properties
 
         public Texture2D Texture
         {
             get{return m_texture;}
-            private set{m_texture = value;}
+            set{m_texture = value;}
         }
         public Vector2 Position
         {
@@ -246,6 +253,7 @@ namespace Yugioh_AtemReturns.GameObjects
                 {
                     _rotateList.Remove(_rotateList.First());
                 }
+                
             }
 
             //SCALE TO
