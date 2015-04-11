@@ -12,41 +12,27 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Yugioh_AtemReturns.Duelists
 {
-    enum ePhase
-    {
-        STARTUP, STANDBY, DRAW, MAIN1, BATTLE, MAIN2, END,
-        TEST
-    }
-    enum ePlayerStatus
-    {
-        IDLE,
-        WAITFORTRIBUTE,
-        SUMONNING
-    }
-    enum eBuffer
-    {
-        MONSTERSUMMON
-    }
+
     delegate void UpdatePhase(GameTime gametime);
 
 
     partial class Player : Duelist
     {
-        Card SummonBuffer;
-        private ePlayerStatus status;
-        private int tribute;
-        private int requireTribute;
+        protected int tribute;
+        protected int requireTribute;
+
+
         private InputController input;
 
         public ePlayerStatus Status
         {
             get
             {
-                return status;
+                return m_status;
             }
             set
             {
-                status = value;
+                m_status = value;
                 switch (value)
                 {
                     case ePlayerStatus.IDLE:
@@ -123,6 +109,7 @@ namespace Yugioh_AtemReturns.Duelists
 
         public override void Update(Microsoft.Xna.Framework.GameTime _gameTime)
         {
+
             if (SummonBuffer != null)
             {
                 if (PlayScene.YNDialog.IsShow)
@@ -147,6 +134,8 @@ namespace Yugioh_AtemReturns.Duelists
             switch (Phase)
             {
                 case ePhase.STARTUP:
+                    if (this.Hand.IsAction == true)
+                        break;
                     if (this.isTurn == true)
                     {
                         if (Hand.Count == 5)

@@ -21,7 +21,7 @@
       <Value Profile="(Default)">535, 300</Value>
     </Setting>
     <Setting Name="PlayerHand" Type="Microsoft.Xna.Framework.Vector2" Scope="Application">
-      <Value Profile="(Default)">290, 540</Value>
+      <Value Profile="(Default)">290, 555</Value>
     </Setting>
     <Setting Name="FieldSlot" Type="Microsoft.Xna.Framework.Vector2" Scope="Application">
       <Value Profile="(Default)">78, 100</Value>

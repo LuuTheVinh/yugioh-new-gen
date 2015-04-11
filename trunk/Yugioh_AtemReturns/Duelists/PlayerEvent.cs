@@ -14,14 +14,14 @@ namespace Yugioh_AtemReturns.Duelists
 {
     partial class Player
     {
-        #region Grayard Implement Event
+        #region Graveyard Implement Event
         private void Graveyard_CardAdded_SetPosition(Deck sender, CardEventArgs e)
         {
             e.Card.STATUS = STATUS.ATK;
             if ((sender as Deck).Count < 16)
-                e.Card.POSITION = GlobalSetting.Default.PlayerGrave - new Vector2(((sender as Deck).Count - 1) / 2);
+                e.Card.Position = GlobalSetting.Default.PlayerGrave - new Vector2(((sender as Deck).Count - 1) / 2);
             else
-                e.Card.POSITION = GlobalSetting.Default.PlayerGrave;
+                e.Card.Position = GlobalSetting.Default.PlayerGrave;
         }
         #endregion
         #region Monster Field Implement Event
@@ -31,18 +31,35 @@ namespace Yugioh_AtemReturns.Duelists
             {
                 case STATUS.DEF:
 
-                    e.Card.POSITION = new Vector2(
+                    //e.Card.POSITION = new Vector2(
+                    //    sender.Position.X + ((MonsterField)sender).CurrentSlot * GlobalSetting.Default.FieldSlot.X + 15,
+                    //    this.MonsterField.Position.Y + 23);
+                    e.Card.Origin = new Vector2(e.Card.Sprite.Texture.Bounds.Center.X, e.Card.Sprite.Texture.Bounds.Center.Y);
+
+                    e.Card.AddMoveTo(new MoveTo(0.3f, new Vector2(
                         sender.Position.X + ((MonsterField)sender).CurrentSlot * GlobalSetting.Default.FieldSlot.X + 15,
-                        this.MonsterField.Position.Y + 23);
+                        this.MonsterField.Position.Y + 23) + e.Card.Origin
+                        ));
+                    e.Card.AddRotateTo(new RotateTo(0.3f, 90));
                     ((MonsterField)sender).CurrentSlot++;
-                    e.Card.s_BackSide.Rotation = (float)(Math.PI / 2);
-                    e.Card.s_BackSide.Origin = new Vector2(e.Card.s_BackSide.Texture.Bounds.Center.X, e.Card.s_BackSide.Texture.Bounds.Center.Y);
-                    e.Card.s_BackSide.Position += new Vector2(e.Card.s_BackSide.Bound.Width / 2, e.Card.s_BackSide.Bound.Width / 2);
+                   // e.Card.Rotation = (float)(Math.PI / 2);
+                    //e.Card.Position += new Vector2(e.Card.Sprite.Bound.Width / 2, e.Card.Sprite.Bound.Width / 2);
                     break;
                 case STATUS.ATK:
-                    e.Card.POSITION = new Vector2(
+                    //e.Card.POSITION = new Vector2(
+                    //    sender.Position.X + ((MonsterField)sender).CurrentSlot * GlobalSetting.Default.FieldSlot.X + 13,
+                    //    sender.Position.Y + 15);
+                    //((MonsterField)sender).CurrentSlot++;
+                    //e.Card.Origin = new Vector2(e.Card.Sprite.Texture.Bounds.Center.X, e.Card.Sprite.Texture.Bounds.Center.Y);
+
+                    e.Card.AddMoveTo(new MoveTo(0.3f, new Vector2(
                         sender.Position.X + ((MonsterField)sender).CurrentSlot * GlobalSetting.Default.FieldSlot.X + 13,
-                        sender.Position.Y + 15);
+                        sender.Position.Y + 15)));
+                    //e.Card.Sprite.AddRotateTo(new RotateTo(0.3f, 90));
+                    //e.Card.Sprite.Origin = new Vector2(e.Card.Sprite.Texture.Bounds.Center.X, e.Card.Sprite.Texture.Bounds.Center.Y);
+                    //e.Card.Sprite.AddMoveTo(new MoveTo(0.3f, new Vector2(
+                    //    sender.Position.X + ((MonsterField)sender).CurrentSlot * GlobalSetting.Default.FieldSlot.X + 13,
+                    //    sender.Position.Y + 15)));
                     ((MonsterField)sender).CurrentSlot++;
                     break;
                 default:
@@ -114,7 +131,7 @@ namespace Yugioh_AtemReturns.Duelists
         #region Spell Field Implement Event
         private void SpellField_CardAdded_SetPosition(Deck sender, CardEventArgs e)
         {
-            e.Card.POSITION = new Vector2(
+            e.Card.Position = new Vector2(
                 sender.Position.X + ((SpellField)sender).CurrentSlot * GlobalSetting.Default.FieldSlot.X + 13,
                 sender.Position.Y + 15);
             ((SpellField)sender).CurrentSlot++;
@@ -172,25 +189,42 @@ namespace Yugioh_AtemReturns.Duelists
         {
             int count = sender.Count;
             if (count == 0) return;
-            sender.ListCard.Last.Value.POSITION = new Vector2(
+            Vector2[] _position = new Vector2[sender.Count];
+            _position[0] = new Vector2(
                     GlobalSetting.Default.CenterField.X - (sender.ListCard.First.Value.Sprite.Bound.Width + GlobalSetting.Default.HandDistance.X) * count / 2,
                     sender.Position.Y);
+            for (int i = 1; i < _position.Length; i++ )
+            {
+                _position[i] = new Vector2(
+                    _position[i - 1].X + sender.ListCard.First.Value.Sprite.Bound.Width + GlobalSetting.Default.HandDistance.X,
+                    sender.Position.Y);
+            }
+
+            //sender.ListCard.Last.Value.Position = new Vector2(
+            //        GlobalSetting.Default.CenterField.X - (sender.ListCard.First.Value.Sprite.Bound.Width + GlobalSetting.Default.HandDistance.X) * count / 2,
+            //        sender.Position.Y);
+            sender.ListCard.Last.Value.AddMoveTo(new MoveTo(0.5f, _position[0]));
             LinkedListNode<Card> node = sender.ListCard.Last.Previous;
+            int j = 1;
             while (node != null)
             {
-                node.Value.POSITION = new Vector2(
-                    node.Next.Value.Sprite.Bound.Right + GlobalSetting.Default.HandDistance.X,
-                    sender.Position.Y);
+                //node.Value.Position = new Vector2(
+                //    node.Next.Value.Sprite.Bound.Right + GlobalSetting.Default.HandDistance.X,
+                //    sender.Position.Y);
+                node.Value.AddMoveTo(new MoveTo(0.5f,_position[j++]));
                 node = node.Previous;
             }
         }
         private void Hand_CardAdded_ScaleCard(Deck sender, CardEventArgs e)
         {
-            e.Card.SCALE = new Vector2(1.5f);
+            //e.Card.AddScaleTo(new ScaleTo(2f, new Vector2(0.75f, 1.5f)));
+            //e.Card.AddScaleTo(new ScaleTo(2f, new Vector2(1.5f, 1.5f)));
+            e.Card.Scale = new Vector2(1.5f);
         }
         private void Hand_CardRemoved_ScaleCard(Deck sender, CardEventArgs e)
         {
-            e.Card.SCALE = new Vector2(1.0f);
+            //e.Card.SCALE = new Vector2(1.0f);
+            e.Card.AddScaleTo(new ScaleTo(0.5f,new Vector2(1.0f)));
         }
 
         private void Hand_CardLeftClick(Card sender, EventArgs e)
@@ -323,13 +357,14 @@ namespace Yugioh_AtemReturns.Duelists
         {
             sender.Position = new Vector2(
                 x: sender.Position.X,
-                y: GlobalSetting.Default.PlayerHand.Y - 15);
+                y: GlobalSetting.Default.PlayerHand.Y - 30);
+
         }
         private void Hand_CardOutHover(Card sender, EventArgs e)
         {
                 sender.Position = new Vector2(
                     x: sender.Position.X,
-                    y: GlobalSetting.Default.PlayerHand.Y + 15);
+                    y: GlobalSetting.Default.PlayerHand.Y + 0);
         }
 
         #endregion //Hand Implement Event

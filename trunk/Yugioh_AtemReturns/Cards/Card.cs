@@ -48,6 +48,14 @@ namespace Yugioh_AtemReturns.Cards
             if (OutHovered != null)
                 OutHovered(this, e);
         }
+
+        public bool IsAction
+        {
+            get
+            {
+                return (this.Sprite.IsAction);
+            }
+        }
         #region Property
         public bool IsFaceUp
         {

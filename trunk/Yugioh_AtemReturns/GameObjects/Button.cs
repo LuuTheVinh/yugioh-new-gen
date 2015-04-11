@@ -106,7 +106,7 @@ namespace Yugioh_AtemReturns.GameObjects
         {
             if (inputController == null)
                 inputController = new InputController();
-            base.Update(gameTime);
+            //base.Update(gameTime);
             //Mouse
             this.CheckMouseUpdate();
             this.UpdateProperties();
