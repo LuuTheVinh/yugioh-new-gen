@@ -31,9 +31,11 @@ namespace Yugioh_AtemReturns.GameObjects
         public bool Selected 
         {
             get { return isSelected; }
-            set { 
+            set
+            {
                 isSelected = value;
-                this.Sprite = selectedImage;
+                if (selectedImage != null) //ADD
+                    this.Sprite = selectedImage;
             }
         }
 
@@ -56,7 +58,11 @@ namespace Yugioh_AtemReturns.GameObjects
             {
                 this.Rotation = this.Sprite.Rotation;
                 isHovered = value;
-                this.Sprite = hoverImage;
+                if (value == true)
+                    this.Sprite = hoverImage;
+                else// ADD
+                    if (normalImage != null)
+                        this.Sprite = normalImage;
             }
         }
         public Sprite NormalImage { get { return normalImage; } }
@@ -172,6 +178,11 @@ namespace Yugioh_AtemReturns.GameObjects
                 {
                     this.Sprite = selectedImage;
                 }
+                else//
+                {
+                    if (normalImage != null)
+                        this.Sprite = normalImage;
+                }//ADD
             }
 
             inputController.End(); //End get inputController

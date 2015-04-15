@@ -9,6 +9,8 @@ using Yugioh_AtemReturns.GameObjects;
 using Yugioh_AtemReturns.Manager;
 using Yugioh_AtemReturns.Scenes;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Content;
+using Yugioh_AtemReturns.Cards.Monsters;
 
 namespace Yugioh_AtemReturns.Duelists
 {
@@ -21,8 +23,13 @@ namespace Yugioh_AtemReturns.Duelists
         protected int tribute;
         protected int requireTribute;
 
-
         private InputController input;
+
+        public InputController Input
+        {
+            get { return input; }
+            set { input = value; }
+        }
 
         public ePlayerStatus Status
         {
@@ -43,7 +50,7 @@ namespace Yugioh_AtemReturns.Duelists
                         break;
                     case ePlayerStatus.SUMONNING:
                         this.CurNormalSummon--;
-                        Hand.SendTo(Hand.RemoveCard(SummonBuffer), eDeckId.MONSTERFIELD);
+                        Hand.SendTo(SummonBuffer, eDeckId.MONSTERFIELD);
                         this.Status = ePlayerStatus.IDLE;
                         break;
                     default:
@@ -59,9 +66,10 @@ namespace Yugioh_AtemReturns.Duelists
                 UpdatePhase(gametime);
         }
 
-        public Player()
+        public Player(ContentManager _content)
             : base(ePlayerId.PLAYER)
-        { }
+        {
+        }
 
         public override void Init()
         {
@@ -97,8 +105,8 @@ namespace Yugioh_AtemReturns.Duelists
             this.Hand.CardRemoved += new CardRemoveEventHandler(Hand_SetPosition);
 
             Phase = ePhase.STARTUP;
-            isTurn = true;
-            this.input = new InputController();
+            IsTurn = true;
+            this.Input = new InputController();
 
         }
         public override void Init(Microsoft.Xna.Framework.Content.ContentManager _content)
@@ -109,7 +117,6 @@ namespace Yugioh_AtemReturns.Duelists
 
         public override void Update(Microsoft.Xna.Framework.GameTime _gameTime)
         {
-
             if (SummonBuffer != null)
             {
                 if (PlayScene.YNDialog.IsShow)
@@ -136,52 +143,58 @@ namespace Yugioh_AtemReturns.Duelists
                 case ePhase.STARTUP:
                     if (this.Hand.IsAction == true)
                         break;
-                    if (this.isTurn == true)
+                    if (this.IsTurn == false)
+                        break;
+                    if (Hand.Count == 5)
                     {
-                        if (Hand.Count == 5)
-                        {
-                            Phase = ePhase.STANDBY;
-                            isTurn = false;
-                        }
-                        else
-                            MainDeck.DrawCard();
+                        Phase = ePhase.END;
                     }
-                    break;
-                case ePhase.STANDBY:
-                    if (this.isTurn == true)
-                    {
-                        Phase = ePhase.DRAW;
-                        this.CurNormalSummon = this.MaxNormalSummon;
-                    }
+                    else
+                        MainDeck.DrawCard();
                     break;
                 case ePhase.DRAW:
+                    if (this.IsTurn == false)
+                        break;
                     MainDeck.DrawCard();
+                    Phase = ePhase.STANDBY;
+                    break;
+                case ePhase.STANDBY:
+                    if (this.IsTurn == false)
+                        break;
                     Phase = ePhase.MAIN1;
+                    this.CurNormalSummon = this.MaxNormalSummon;
                     break;
                 case ePhase.MAIN1:
+
                     break;
                 case ePhase.BATTLE:
+                   // battlePhase.Begin(this, PlayScene.Computer);
                     break;
                 case ePhase.MAIN2:
                     break;
                 case ePhase.END:
-                    Phase = ePhase.STANDBY;
-                    isTurn = false;
+                    foreach (var card in MonsterField.ListCard)
+                    {
+                        (card as Monster).SwitchBattlePosition = true;
+                    }
+                    Phase = ePhase.DRAW;
+                    IsTurn = false;
                     break;
                 case ePhase.TEST:
                     break;
                 default:
                     break;
             }
-            this.input.Begin();
-            if (input.isKeyPress(Keys.Escape))
+            this.Input.Begin();
+            if (Input.isKeyPress(Keys.Escape))
             {
                 if (this.Status == ePlayerStatus.WAITFORTRIBUTE)
                 {
                     PlayScene.YNDialog.Show();
                 }
             }
-            this.input.End();
+
+            this.Input.End();
         }
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch _spriteBatch)
         {

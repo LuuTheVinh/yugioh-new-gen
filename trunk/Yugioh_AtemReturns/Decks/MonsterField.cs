@@ -6,6 +6,7 @@ using Yugioh_AtemReturns.Cards;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Yugioh_AtemReturns.Cards.Monsters;
+using Yugioh_AtemReturns.Duelists;
 
 namespace Yugioh_AtemReturns.Decks
 {
@@ -13,6 +14,27 @@ namespace Yugioh_AtemReturns.Decks
     {
         private int curSlot;
         private bool[] m_aSlot;
+        private bool m_CanATK;
+
+        public bool CanAttack
+        {
+            get
+            {
+                if (m_CanATK == false)
+                    return false;
+                foreach (var card in ListCard)
+                {
+                    if ((card as Monster).CanATK == true)
+                        return true;
+                }
+                return false;
+            }
+            set
+            {
+                m_CanATK = true;
+            }
+        }
+
         public int CurrentSlot
         {
             get { return curSlot; }
@@ -39,6 +61,7 @@ namespace Yugioh_AtemReturns.Decks
         sealed protected override void Init()
         {
             base.Init();
+            CanAttack = true;
             this.CardAdded += new CardAddedEventHandler(MonsterField_CardAdded);
             this.CardRemoved +=new CardRemoveEventHandler(MonsterField_CardRemoved);
             m_aSlot = new bool[5];
@@ -53,6 +76,11 @@ namespace Yugioh_AtemReturns.Decks
             base.Draw(_spriteBatch);
             _spriteBatch.End();
         }
+
+        public bool AnySlot()
+        {
+            return this.Count < MaxCard;
+        }
         private void MonsterField_CardAdded(Deck sender, CardEventArgs e)
         {
             while (m_aSlot[CurrentSlot] == true)
@@ -63,7 +91,14 @@ namespace Yugioh_AtemReturns.Decks
         }
         private void MonsterField_CardRemoved(Deck sender, CardEventArgs e)
         {
-            m_aSlot[Convert.ToInt32((e.Card.Position.X - sender.Position.X) / GlobalSetting.Default.FieldSlot.X)] = false;
+            try
+            {
+                m_aSlot[Convert.ToInt32((e.Card.Position.X - sender.Position.X) / GlobalSetting.Default.FieldSlot.X)] = false;
+            }
+            catch
+            {
+                m_aSlot[Convert.ToInt32((sender.Position.X - e.Card.Position.X) / ComputerSetting.Default.FieldSlot.X)] = false;
+            }
         }
     }
 }

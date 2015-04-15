@@ -14,17 +14,15 @@ namespace Yugioh_AtemReturns.Scenes
     class PlayScene : Scene
     {
         public static YesNoDialog YNDialog;
-        //MainDeck maindeck;
         private Sprite background;
-        //Yugioh_AtemReturns.Cards.Traps.Trap test0;
         public static Player Player;
         public static Computer Computer;
-
-        //Sprite _detail;
         private PhaseSelector phaseSelector;
 
         RasterizerState _rasterizerState;
         public static DetailSideBar DetailSideBar;
+        BattlePhase battlePhase;
+
         public override void Init(Game _game)
         {
             base.Init(_game);
@@ -32,16 +30,16 @@ namespace Yugioh_AtemReturns.Scenes
             background.Position = new Vector2(230, 0);
             background.Depth = 0.0f;
 
-            Player = new Player();
+
+            Player = new Player(_game.Content);
             Player.Init(Game.Content);
 
             Computer = new Computer();
             Computer.Init(Game.Content);
 
-            Player.isTurn = true;
-            Computer.isTurn = false;
+            Player.IsTurn = true;
+            Computer.IsTurn = false;
 
-            //_detail = new Sprite(SpriteManager.getInstance(_game.Content).GetSprite(SpriteID.detail));
 
             YNDialog = new YesNoDialog(_game.Content, "String");
             YNDialog.Position = new Vector2(
@@ -49,12 +47,16 @@ namespace Yugioh_AtemReturns.Scenes
                 y: this.Game.Window.ClientBounds.Center.Y - YNDialog.Sprite.Bound.Height / 2);
 
             phaseSelector = new PhaseSelector(_game.Content);
+            phaseSelector.DrawPhaseButton.ButtonEvent += new Action(DrawPhaseButton_ButtonEvent);
+            phaseSelector.StandbyButton.ButtonEvent += new Action(StandbyButton_ButtonEvent);
+            phaseSelector.Main1Button.ButtonEvent +=new Action(Main1Button_ButtonEvent);
             phaseSelector.EndPhaseButton.ButtonEvent += new Action(EndPhaseButton_ButtonEvent);
             phaseSelector.Main2Button.ButtonEvent += new Action(Main2Button_ButtonEvent);
             phaseSelector.BattleButton.ButtonEvent += new Action(BattleButton_ButtonEvent);
 
             _rasterizerState = new RasterizerState() { ScissorTestEnable = true };
             DetailSideBar = new DetailSideBar(_game.Content);
+            battlePhase = new BattlePhase(_game.Content);
         }
         public override void Update(GameTime _gameTime)
         {
@@ -62,28 +64,39 @@ namespace Yugioh_AtemReturns.Scenes
                 return;
             base.Update(_gameTime);
 
-            YNDialog.Update(_gameTime); 
-            if (Player.isTurn == true)
+            YNDialog.Update(_gameTime);
+            if (Player.IsTurn == true)
             {
-                Player.Update(_gameTime);
-                Computer.Update(_gameTime);
-                if (Player.isTurn == false)
+             
+                Player.Update(_gameTime); //
+                Computer.Update(_gameTime);///s
+                
+                    
+                if (Player.IsTurn == false)
                 {
-                    Computer.isTurn = true;
+                    Computer.IsTurn = true;
                 }
+
+                if (Player.Phase != ePhase.STARTUP)
+                {
+                    if (Player.Status == ePlayerStatus.IDLE)
+                        this.phaseSelector.Update(_gameTime);
+                }
+
             }
             else
             {
-                Player.Update(_gameTime);
-                Computer.Update(_gameTime);
-                if (Computer.isTurn == false)
+                Player.Update(_gameTime);//
+                Computer.Update(_gameTime);// 4 chỗ cmt này không được để ở ngoài if 
+                if (Computer.IsTurn == false)
                 {
-                    Player.isTurn = true;
+                    Player.IsTurn = true;
                 }
             }
-            if (Player.Status == ePlayerStatus.IDLE)
-                this.phaseSelector.Update(_gameTime);
-            this.phaseSelector.UpdateButton(Player);
+            this.phaseSelector.Update(Player);
+            this.phaseSelector.Update(Computer);
+            battlePhase.Update(Player, Computer);
+            battlePhase.Update(_gameTime);
             DetailSideBar.Update(_gameTime);
         }
 
@@ -106,7 +119,7 @@ namespace Yugioh_AtemReturns.Scenes
 
             Player.Draw(_spriteBatch);
             Computer.Draw(_spriteBatch);
-
+            battlePhase.Draw(_spriteBatch);
             _spriteBatch.Begin();
             PlayScene.YNDialog.Draw(_spriteBatch);
             _spriteBatch.End();
@@ -115,23 +128,44 @@ namespace Yugioh_AtemReturns.Scenes
 
 
         #region Phase
-        private void EndPhaseButton_ButtonEvent()
+
+        private void DrawPhaseButton_ButtonEvent()
         {
-            Player.Phase = ePhase.END;
+            phaseSelector.DrawPhaseButton.Selected = false;
+        }
+        private void StandbyButton_ButtonEvent()
+        {
+            phaseSelector.StandbyButton.Selected = false;
+        }
+        private void Main1Button_ButtonEvent()
+        {
+            phaseSelector.Main1Button.Selected = false;
+        }
+        private void BattleButton_ButtonEvent()
+        {
+
+            phaseSelector.BattleButton.Selected = false;
+            if (Player.Phase != ePhase.MAIN1)
+                return;
+            if (Player.MonsterField.CanAttack == false)
+                return;
+            battlePhase.Begin(Player, Computer);
+            Player.Phase = ePhase.BATTLE;
         }
         private void Main2Button_ButtonEvent()
         {
             if (Player.Phase == ePhase.BATTLE)
-                Player.Phase = ePhase.MAIN2;
-        }
-        private void BattleButton_ButtonEvent()
-        {
-            foreach (var item in Player.MonsterField.ListCard)
             {
-                if (item.STATUS == STATUS.ATK)
-                    Player.Phase = ePhase.BATTLE;
+                Player.Phase = ePhase.MAIN2;
+                return;
             }
+            phaseSelector.Main2Button.Selected = false;
+        }
 
+        private void EndPhaseButton_ButtonEvent()
+        {
+            Player.Phase = ePhase.END;
+            phaseSelector.EndPhaseButton.Selected = false;
         }
         #endregion // Phases
     }

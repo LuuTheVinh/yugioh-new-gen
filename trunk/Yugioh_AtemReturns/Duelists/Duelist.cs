@@ -8,19 +8,21 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Yugioh_AtemReturns.Cards;
+using Yugioh_AtemReturns.Scenes;
 
 namespace Yugioh_AtemReturns.Duelists
 {
     enum ePhase
     {
-        STARTUP, STANDBY, DRAW, MAIN1, BATTLE, MAIN2, END,
+        STARTUP, DRAW, STANDBY, MAIN1, BATTLE, MAIN2, END,
         TEST
     }
     enum ePlayerStatus
     {
         IDLE,
         WAITFORTRIBUTE,
-        SUMONNING
+        SUMONNING,
+        ATTACKING
     }
     enum eBuffer
     {
@@ -35,14 +37,39 @@ namespace Yugioh_AtemReturns.Duelists
         protected Transfer transfer;
         protected int m_maxNormalSummon;
         protected int m_CurNormalSummon;
+        protected ePlayerId m_duelistID;
+        protected bool m_isTurn;
+
+
+        public ePlayerId DuelistID {
+            get
+            {
+                return m_duelistID;
+            }
+            set
+            {
+                m_duelistID = value;
+            }
+        }
+
         #region Property
         public Transfer Transfer
         {
             get { return transfer; }
             protected set { transfer = value; }
         }
-    
-        public bool isTurn;
+
+        public bool IsTurn
+        {
+            get
+            {
+                return m_isTurn;
+            }
+            set
+            {
+                m_isTurn = value;
+            }
+        }
         public Card SummonBuffer
         {
             get
@@ -108,6 +135,7 @@ namespace Yugioh_AtemReturns.Duelists
             };
             this.Init();
             transfer = new Transfer();
+            this.DuelistID = _id;
         }
 
         public virtual void Update(GameTime gametime)

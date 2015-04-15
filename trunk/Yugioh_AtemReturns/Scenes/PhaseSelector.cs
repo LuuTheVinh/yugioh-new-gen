@@ -63,7 +63,13 @@ namespace Yugioh_AtemReturns.Scenes
                 buttons[i].HoverImage.Frame = new Rectangle(40, 0, 25, 75);
                 buttons[i].Sprite.Position = GlobalSetting.Default.Phase + GlobalSetting.Default.PhaseSpace * i;
             }
+            
         }
+
+        /// <summary>
+        /// Kiểm tra sự kiện click chuột lên các nút chuyển phase
+        /// </summary>
+        /// <param name="_gameTime"></param>
         public void Update(GameTime _gameTime)
         {
             foreach (var item in buttons)
@@ -79,49 +85,30 @@ namespace Yugioh_AtemReturns.Scenes
                 item.Draw(_spriteBatch);
             }
         }
-        public void UpdateButton(Player _player)
+
+        public void Update(Duelist _duelist)
         {
-            Rectangle CurPhase;
-            Rectangle NonCurPhase;
-            if (_player.isTurn == true)
+            if (_duelist.IsTurn == false)
+                return;
+            if (_duelist.DuelistID == Decks.ePlayerId.COMPUTER)
             {
-                CurPhase = new Rectangle(40, 0, 25, 75);
-                NonCurPhase = new Rectangle(0, 0, 25, 75);
+                foreach (var bt in buttons)
+                {
+                    bt.Hovered = false;
+                }
             }
-            else
+            int frameY = 75 * Convert.ToInt32(_duelist.DuelistID);
+            foreach (var button in buttons)
             {
-                CurPhase = new Rectangle(40, 75, 25, 75);
-                NonCurPhase = new Rectangle(0, 75, 25, 75);
+                button.NormalImage.Frame = new Rectangle(0,frameY,25,75);
             }
-            if (_player.Phase == ePhase.STANDBY)
-                this.StandbyButton.NormalImage.Frame = CurPhase;
-            else
-                this.StandbyButton.NormalImage.Frame = NonCurPhase;
-
-            if (_player.Phase == ePhase.DRAW)
-                this.DrawPhaseButton.NormalImage.Frame = CurPhase;
-            else
-                this.DrawPhaseButton.NormalImage.Frame = NonCurPhase;
-
-            if (_player.Phase == ePhase.MAIN1)
-                Main1Button.NormalImage.Frame = CurPhase;
-            else
-                Main1Button.NormalImage.Frame = NonCurPhase;
-
-            if (_player.Phase == ePhase.BATTLE)
-                this.BattleButton.NormalImage.Frame = CurPhase;
-            else
-                this.BattleButton.NormalImage.Frame = NonCurPhase;
-
-            if (_player.Phase == ePhase.MAIN2)
-                this.Main2Button.NormalImage.Frame = CurPhase;
-            else
-                this.Main2Button.NormalImage.Frame = NonCurPhase;
-
-            if (_player.Phase == ePhase.END)
-                this.EndPhaseButton.NormalImage.Frame = CurPhase;
-            else
-                this.EndPhaseButton.NormalImage.Frame = NonCurPhase;
+            try
+            {
+                buttons[Convert.ToInt32(_duelist.Phase) - 1].NormalImage.Frame = new Rectangle(40, frameY, 25, 75);
+            }
+            catch { }
+            
         }
+
     }
 }

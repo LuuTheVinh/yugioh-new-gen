@@ -50,6 +50,7 @@ namespace Yugioh_AtemReturns.Decks
         {
             foreach (Deck deck in _listDeck)
             {
+
                 if (deck.OutCard != null)
                 {
                     this.removeFrom(deck);

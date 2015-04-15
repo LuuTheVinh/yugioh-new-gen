@@ -17,23 +17,31 @@ namespace Yugioh_AtemReturns.Duelists
         #region Graveyard Implement Event
         private void Graveyard_CardAdded_SetPosition(Deck sender, CardEventArgs e)
         {
-            e.Card.STATUS = STATUS.ATK;
-            if ((sender as Deck).Count < 16)
-                e.Card.Position = GlobalSetting.Default.PlayerGrave - new Vector2(((sender as Deck).Count - 1) / 2);
-            else
-                e.Card.Position = GlobalSetting.Default.PlayerGrave;
+            if (e.Card.STATUS == STATUS.TRIBUTE)
+                return;
+            //if (e.Card.STATUS == STATUS.DEF)
+            if ((e.Card as Monster).BattlePosition == eBattlePosition.DEF)
+                e.Card.Sprite.Rotation = 0f;
+           // e.Card.AddMoveTo(new MoveTo(1f, e.Card.Position));
+            //e.Card.AddMoveTo(new MoveTo(1f, GlobalSetting.Default.PlayerGrave - new Vector2(((sender as Deck).Count - 1) / 2)));
+            //e.Card.STATUS = STATUS.ATK;
+            (e.Card as Monster).BattlePosition = eBattlePosition.ATK;
+            e.Card.STATUS = STATUS.NORMAL;
+            //if ((sender as Deck).Count < 16)
+            //    e.Card.Position = GlobalSetting.Default.PlayerGrave - new Vector2(((sender as Deck).Count - 1) / 2);
+            //else
+            //    e.Card.Position = GlobalSetting.Default.PlayerGrave;
         }
         #endregion
         #region Monster Field Implement Event
         private void MonsterField_CardAdded_SetPosition(Deck sender, CardEventArgs e)
         {
-            switch (e.Card.STATUS)
+            //switch (e.Card.STATUS)
+            //{
+            //    case STATUS.DEF:
+            switch ((e.Card as Monster).BattlePosition)
             {
-                case STATUS.DEF:
-
-                    //e.Card.POSITION = new Vector2(
-                    //    sender.Position.X + ((MonsterField)sender).CurrentSlot * GlobalSetting.Default.FieldSlot.X + 15,
-                    //    this.MonsterField.Position.Y + 23);
+                case eBattlePosition.DEF:
                     e.Card.Origin = new Vector2(e.Card.Sprite.Texture.Bounds.Center.X, e.Card.Sprite.Texture.Bounds.Center.Y);
 
                     e.Card.AddMoveTo(new MoveTo(0.3f, new Vector2(
@@ -42,24 +50,11 @@ namespace Yugioh_AtemReturns.Duelists
                         ));
                     e.Card.AddRotateTo(new RotateTo(0.3f, 90));
                     ((MonsterField)sender).CurrentSlot++;
-                   // e.Card.Rotation = (float)(Math.PI / 2);
-                    //e.Card.Position += new Vector2(e.Card.Sprite.Bound.Width / 2, e.Card.Sprite.Bound.Width / 2);
                     break;
-                case STATUS.ATK:
-                    //e.Card.POSITION = new Vector2(
-                    //    sender.Position.X + ((MonsterField)sender).CurrentSlot * GlobalSetting.Default.FieldSlot.X + 13,
-                    //    sender.Position.Y + 15);
-                    //((MonsterField)sender).CurrentSlot++;
-                    //e.Card.Origin = new Vector2(e.Card.Sprite.Texture.Bounds.Center.X, e.Card.Sprite.Texture.Bounds.Center.Y);
-
+                case eBattlePosition.ATK:
                     e.Card.AddMoveTo(new MoveTo(0.3f, new Vector2(
                         sender.Position.X + ((MonsterField)sender).CurrentSlot * GlobalSetting.Default.FieldSlot.X + 13,
                         sender.Position.Y + 15)));
-                    //e.Card.Sprite.AddRotateTo(new RotateTo(0.3f, 90));
-                    //e.Card.Sprite.Origin = new Vector2(e.Card.Sprite.Texture.Bounds.Center.X, e.Card.Sprite.Texture.Bounds.Center.Y);
-                    //e.Card.Sprite.AddMoveTo(new MoveTo(0.3f, new Vector2(
-                    //    sender.Position.X + ((MonsterField)sender).CurrentSlot * GlobalSetting.Default.FieldSlot.X + 13,
-                    //    sender.Position.Y + 15)));
                     ((MonsterField)sender).CurrentSlot++;
                     break;
                 default:
@@ -68,10 +63,14 @@ namespace Yugioh_AtemReturns.Duelists
         }
         private void MonsterField_CardAdded(Deck sender, CardEventArgs e)
         {
+
+            e.Card.IsFaceUp = ((e.Card as Monster).BattlePosition == eBattlePosition.ATK) ? true : false;
+
             e.Card.LeftClick += MonsterField_CardLeftClick;
             e.Card.RightClick += MonsterField_CardRightClick;
             e.Card.OutHovered += MonsterField_CardOutHover;
             e.Card.Hovered += MonsterField_CardOnHover;
+            (e.Card as Monster).SwitchBattlePosition = false;
         }
         private void MonsterField_CardRemove(Deck sender, CardEventArgs e)
         {
@@ -79,7 +78,8 @@ namespace Yugioh_AtemReturns.Duelists
             e.Card.RightClick -= MonsterField_CardRightClick;
             e.Card.OutHovered -= MonsterField_CardOutHover;
             e.Card.Hovered -= MonsterField_CardOnHover;
-
+            //if (e.Card.Origin != Vector2.Zero)
+            //    e.Card.Origin = Vector2.Zero;
         }
 
         private void MonsterField_CardLeftClick(Card sender, EventArgs e)
@@ -87,10 +87,24 @@ namespace Yugioh_AtemReturns.Duelists
             switch (this.Status)
             {
                 case ePlayerStatus.IDLE:
+                    if ((sender as Monster).SwitchBattlePosition == false)
+                        break;
+                    switch ((sender as Monster).BattlePosition)
+	                {
+                        case eBattlePosition.ATK:
+                            (sender as Monster).SwitchToDef();
+                            break;
+                        case eBattlePosition.DEF:
+                            (sender as Monster).SwitchToAtk();
+                            break;
+                        default:
+                            break;
+	                }
                     break;
                 case ePlayerStatus.WAITFORTRIBUTE:
-                    sender.LeftClick -= MonsterField_CardLeftClick_WaitForTribute;
-                    this.MonsterField.SendTo(MonsterField.RemoveCard(sender), eDeckId.GRAVEYARD);
+                    sender.STATUS = STATUS.TRIBUTE;
+
+                    this.MonsterField.SendTo(sender, eDeckId.GRAVEYARD);
                     this.tribute++;
                     if (this.tribute == this.requireTribute)
                     {
@@ -103,17 +117,7 @@ namespace Yugioh_AtemReturns.Duelists
                     break;
             }
         }
-        private void MonsterField_CardLeftClick_WaitForTribute(Card sender, EventArgs e)
-        {
-            sender.LeftClick -= MonsterField_CardLeftClick_WaitForTribute;
-            this.MonsterField.SendTo(MonsterField.RemoveCard(sender), eDeckId.GRAVEYARD);
-            this.tribute++;
-            if (this.tribute == this.requireTribute)
-            {
-                this.Status = ePlayerStatus.SUMONNING;
-            }
 
-        }
         private void MonsterField_CardRightClick(Card sender, EventArgs e)
         {
             System.Diagnostics.Debug.WriteLine("Right click");
@@ -124,7 +128,7 @@ namespace Yugioh_AtemReturns.Duelists
         }
         private void MonsterField_CardOnHover(Card sender, EventArgs e)
         {
-
+            PlayScene.DetailSideBar.SetCardPreview(sender.ToString());
         }
         #endregion //Monster Field Implement Event
 
@@ -231,7 +235,7 @@ namespace Yugioh_AtemReturns.Duelists
         {
             if (this.Status != ePlayerStatus.IDLE)
                 return;
-            if (isTurn == false)
+            if (IsTurn == false)
                 return;
             if (Phase != ePhase.MAIN1 && Phase != ePhase.MAIN2)
                 return;
@@ -259,24 +263,27 @@ namespace Yugioh_AtemReturns.Duelists
                         {
                             PlayScene.YNDialog.Show("Summon this monster require " + this.requireTribute.ToString() + " monster tribute. Do you want to summon?");
                             this.SummonBuffer = sender;
-                            sender.STATUS = STATUS.ATK;
+                            //sender.STATUS = STATUS.ATK;
+                            (sender as Monster).BattlePosition = eBattlePosition.ATK;
                             return;
                         }
                     }
                     else
                     {
+                        //return;//test
                         if (this.MonsterField.Count == MonsterField.MaxCard)
                             return;
                     }
                     SummonBuffer = sender;
                     this.Status = ePlayerStatus.SUMONNING;
-                    sender.STATUS = STATUS.ATK;
+                    //sender.STATUS = STATUS.ATK;
+                    (sender as Monster).BattlePosition = eBattlePosition.ATK;
 
                     break;
                 case eCardType.TRAP:
                     break;
                 case eCardType.SPELL:
-                    Hand.SendTo(Hand.RemoveCard(sender), eDeckId.SPELLFIELD);
+                    Hand.SendTo(sender, eDeckId.SPELLFIELD);
                     break;
                 case eCardType.XYZ:
                     break;
@@ -293,7 +300,7 @@ namespace Yugioh_AtemReturns.Duelists
         {
             if (this.Status != ePlayerStatus.IDLE)
                 return; 
-            if (isTurn == false)
+            if (IsTurn == false)
                 return;
             if (Phase != ePhase.MAIN1 && Phase != ePhase.MAIN2)
                 return;
@@ -318,11 +325,12 @@ namespace Yugioh_AtemReturns.Duelists
                         if (this.MonsterField.Count < this.requireTribute)
                             return;
                         this.Status = ePlayerStatus.WAITFORTRIBUTE;
-                        if (!PlayScene.YNDialog.IsShow && this.SummonBuffer == null)
+                        if (PlayScene.YNDialog.IsShow == false && this.SummonBuffer == null)
                         {
                             PlayScene.YNDialog.Show("Summon this monster require " + Convert.ToString(this.requireTribute) + " monster tribute. Do you want to summon?");
                             this.SummonBuffer = sender;
-                            sender.STATUS = STATUS.DEF;
+                            //sender.STATUS = STATUS.DEF;
+                            (sender as Monster).BattlePosition = eBattlePosition.DEF;
                             return;
                         }
                     }
@@ -333,14 +341,15 @@ namespace Yugioh_AtemReturns.Duelists
                     }
                     SummonBuffer = sender;
                     this.Status = ePlayerStatus.SUMONNING;
-                    sender.STATUS = STATUS.DEF;
+                    //sender.STATUS = STATUS.DEF;
+                    (sender as Monster).BattlePosition = eBattlePosition.DEF;
                     break;
                 case eCardType.TRAP:
-                    Hand.SendTo(Hand.RemoveCard(sender), eDeckId.SPELLFIELD);
+                    Hand.SendTo(sender, eDeckId.SPELLFIELD);
                     sender.IsFaceUp = false;
                     break;
                 case eCardType.SPELL:
-                    Hand.SendTo(Hand.RemoveCard(sender), eDeckId.SPELLFIELD);
+                    Hand.SendTo(sender, eDeckId.SPELLFIELD);
                     sender.IsFaceUp = false;
                     break;
                 case eCardType.XYZ:
@@ -355,6 +364,8 @@ namespace Yugioh_AtemReturns.Duelists
         }
         private void Hand_CardOnHover(Card sender, EventArgs e)
         {
+            if (sender.IsAction)
+                return; 
             sender.Position = new Vector2(
                 x: sender.Position.X,
                 y: GlobalSetting.Default.PlayerHand.Y - 30);
@@ -362,9 +373,9 @@ namespace Yugioh_AtemReturns.Duelists
         }
         private void Hand_CardOutHover(Card sender, EventArgs e)
         {
-                sender.Position = new Vector2(
-                    x: sender.Position.X,
-                    y: GlobalSetting.Default.PlayerHand.Y + 0);
+            sender.Position = new Vector2(
+                x: sender.Position.X,
+                y: GlobalSetting.Default.PlayerHand.Y + 0);
         }
 
         #endregion //Hand Implement Event
