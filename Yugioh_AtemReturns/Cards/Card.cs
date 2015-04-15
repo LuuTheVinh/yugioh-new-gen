@@ -18,11 +18,11 @@ namespace Yugioh_AtemReturns.Cards
     delegate void CardHoveredEventHandle(Card sender, EventArgs e);
     abstract class Card : MyObject
     {
-
+        private Sprite m_yellow_circle;
         private eCardType cardType;
         private bool isFaceUp;
         private Button button;
-        
+        //private bool m_CanAtk;
         public event CardLeftClickEventHandle LeftClick;
         public event CardLeftClickEventHandle RightClick;
         public event CardHoveredEventHandle Hovered;
@@ -49,14 +49,28 @@ namespace Yugioh_AtemReturns.Cards
                 OutHovered(this, e);
         }
 
+
+        #region Property
+        //public bool CanATK
+        //{
+        //    get
+        //    {
+        //        return m_CanAtk;
+        //    }
+        //    set
+        //    {
+        //        m_CanAtk = value;
+        //    }
+        //}
         public bool IsAction
         {
             get
             {
+                if (m_yellow_circle.IsAction == true)
+                    return true;
                 return (this.Sprite.IsAction);
             }
         }
-        #region Property
         public bool IsFaceUp
         {
             get { return isFaceUp; }
@@ -90,10 +104,12 @@ namespace Yugioh_AtemReturns.Cards
             set
             {
                 base.Status = value;
-                if (value == STATUS.DEF)
-                    this.IsFaceUp = false;
-                if (value == STATUS.ATK)
-                    this.IsFaceUp = true;
+
+                if (value == Yugioh_AtemReturns.STATUS.TRIBUTE)
+                {
+                    m_yellow_circle.AddScaleTo(new ScaleTo(1.25f, Vector2.One));
+                    m_yellow_circle.AddRotateTo(new RotateTo(1.25f, 180f));
+                }
             }
         }
         #endregion
@@ -102,26 +118,39 @@ namespace Yugioh_AtemReturns.Cards
         public Card(ContentManager _content, ID _id, SpriteID _spriteId, eCardType _cardType)
             : base(_content, _id, _spriteId)
         {
+            m_yellow_circle = new Sprite(SpriteManager.getInstance(_content).GetSprite(SpriteID.eff_y_circle));
+            m_yellow_circle.Scale = new Vector2(0.2f);
+            m_yellow_circle.Origin = new Vector2(m_yellow_circle.Size.X / 2, m_yellow_circle.Size.Y / 2);
+
             m_backsideTexture = SpriteManager.getInstance(_content).GetTexture(SpriteID.CBackSide);
-            m_frontsideTexture = SpriteManager.getInstance(_content).GetTexture(_spriteId); 
+            m_frontsideTexture = SpriteManager.getInstance(_content).GetTexture(_spriteId);
+            //this.CanATK = true;
             this.IsFaceUp = true;
             this.CardType = _cardType;
             this.Button = new Button(this.Sprite);
             this.Button.Position = this.Position;
             this.Button.ButtonEvent += new Action(Button_DoActionClick);
             this.Button.RightClick += new Action(Button_OnRightClick);
-            this.Hovered += new CardHoveredEventHandle(Card_Hovered); 
+            this.Hovered += new CardHoveredEventHandle(Card_Hovered);
         }
 
         public override void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch _spritebatch)
         {
+
             base.Draw(_spritebatch);
+            if (this.STATUS == Yugioh_AtemReturns.STATUS.TRIBUTE)
+                m_yellow_circle.Draw(_spritebatch); 
         }
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            this.Button.Update(gameTime);
 
+            this.Button.Update(gameTime);
+            if (this.STATUS == Yugioh_AtemReturns.STATUS.TRIBUTE)
+            {
+                m_yellow_circle.Position = new Vector2(this.Sprite.Bound.Center.X, this.Sprite.Bound.Center.Y); 
+                m_yellow_circle.Update(gameTime);
+            }
             if (this.Button.Hovered)
             {
                 this.OnHovered(EventArgs.Empty);

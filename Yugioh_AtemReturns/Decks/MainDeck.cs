@@ -15,6 +15,7 @@ namespace Yugioh_AtemReturns.Decks
     class MainDeck : Deck
     {
         private Sprite m_sprite;
+       
         //private SpriteFont m_font;
 
         public Sprite Sprite
@@ -22,7 +23,6 @@ namespace Yugioh_AtemReturns.Decks
             get { return m_sprite; }
             set { m_sprite = value; }
         }
-
         public MainDeck( ePlayerId _id)
             : base(_id, eDeckId.MAINDECK)
         {
@@ -57,7 +57,7 @@ namespace Yugioh_AtemReturns.Decks
             {
                 //if (Sprite != null)
                 //    this.Sprite = ListCard.First.Value.s_BackSide;
-                for (int i = 0; i <= Math.Min(ListCard.Count / 2, 20); i++)
+                for (int i = 0; i <= Math.Min(ListCard.Count / 4, 10); i++)
                 {
                     spritebatch.Draw(
                         this.Sprite.Texture,
@@ -77,7 +77,6 @@ namespace Yugioh_AtemReturns.Decks
         {
             this.MoveTopToDeck(eDeckId.HAND);
         }
-
 
         // For Player
         //public void Update(KeyboardState _keyboardState)

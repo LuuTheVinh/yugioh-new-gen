@@ -11,9 +11,6 @@ namespace Yugioh_AtemReturns.Decks
     {
         private int m_maxCard;
 
-        public Rectangle Bound;
-
-        private LinkedListNode<Card> SelectCard;
 
         public int MaxCard
         {

@@ -3,9 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework;
+using Yugioh_AtemReturns.GameObjects;
 
 namespace Yugioh_AtemReturns.Cards.Monsters
 {
+    enum eBattlePosition
+    {
+        ATK, DEF
+    }
     class Monster :Card
     {
 
@@ -20,10 +26,47 @@ namespace Yugioh_AtemReturns.Cards.Monsters
         private int rank;
         private int pendulumScale;
         private int spellSpeed;
+        private eBattlePosition battlePosition;
+        private bool m_CanAtk;
         #endregion
 
         #region Property
-
+        public bool SwitchBattlePosition { get; set; }
+        public bool CanATK
+        {
+            get
+            {
+                return m_CanAtk;
+            }
+            set
+            {
+                m_CanAtk = value;
+            }
+        }
+        public eBattlePosition BattlePosition
+        {
+            get
+            {
+                return battlePosition;
+            }
+            set
+            {
+                battlePosition = value;
+                switch (value)
+                {
+                    case eBattlePosition.ATK:
+                    //this.IsFaceUp = true;
+                    this.CanATK = true;
+                        break;
+                    case eBattlePosition.DEF:
+                    //this.IsFaceUp = false;
+                    this.CanATK = false;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
         public MonsterCardData Original
         {
             get { return originalData; }
@@ -126,6 +169,7 @@ namespace Yugioh_AtemReturns.Cards.Monsters
             this.Rank = Original.Rank;
             this.PendulumScale = Original.PendulumScale;
             this.SpellSpeed = Original.SpellSpeed;
+            this.CanATK = true;
         }
         public Monster(ContentManager _content, string _cardId)
             : base(_content, ID.CARD, (SpriteID)(Enum.Parse(typeof(SpriteID),"C"+ _cardId)), eCardType.MONSTER)
@@ -140,11 +184,33 @@ namespace Yugioh_AtemReturns.Cards.Monsters
             this.Rank = Original.Rank;
             this.PendulumScale = Original.PendulumScale;
             this.SpellSpeed = Original.SpellSpeed;
+            this.CanATK = true;
         }
 
         public override void Update(Microsoft.Xna.Framework.GameTime gameTime)
         {
             base.Update(gameTime);
+        }
+
+        public void SwitchToDef()
+        {
+            this.BattlePosition = eBattlePosition.DEF;
+            this.SwitchBattlePosition = false;
+            this.Origin = new Vector2(this.Sprite.Size.X / 2, this.Sprite.Size.Y / 2);
+            this.Position = this.Position + this.Origin;
+            this.AddRotateTo(new RotateTo(0.5f, 90));
+        }
+
+        public void SwitchToAtk()
+        {
+            this.BattlePosition = eBattlePosition.ATK;
+            this.SwitchBattlePosition = false;
+            this.Origin = new Vector2(this.Sprite.Size.X / 2, this.Sprite.Size.Y / 2);
+            this.AddRotateTo(new RotateTo(0.5f, 0));
+        }
+        public void Flip()
+        {
+            this.IsFaceUp = true;
         }
     }
 }

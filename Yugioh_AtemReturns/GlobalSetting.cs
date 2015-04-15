@@ -14,6 +14,8 @@ namespace Yugioh_AtemReturns
         pha_r_ba, pha_r_dr, pha_r_en, pha_r_m1, pha_r_m2, pha_r_st,
         pha_s_ba, pha_s_dr, pha_s_en, pha_s_m1, pha_s_m2, pha_s_st,
 
+        eff_y_circle, atk_sword,
+
         C1002,
         C1003,
         C3005,
@@ -40,16 +42,21 @@ namespace Yugioh_AtemReturns
 
     public enum ID
     {
-        CARD
+        CARD,
+        BATTLE_SWORD,
     }
 
     public enum STATUS
     {
+        
         NORMAL,
         DESTROY,
         MOUSEON,
-        DEF,
-        ATK,      
+        //DEF,
+        //ATK,  
+        TRIBUTE,
+        SWORD_FULL,
+        SWORD_HALF
     }
     #endregion
 

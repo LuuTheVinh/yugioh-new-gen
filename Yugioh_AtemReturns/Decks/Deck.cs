@@ -141,9 +141,9 @@ namespace Yugioh_AtemReturns.Decks
             OnCardAdded(new CardEventArgs(_card));
         }
 
-        public virtual void SendTo(LinkedListNode<Card >_card, eDeckId _deck)
+        public virtual void SendTo(Card _card, eDeckId _deck)
         {
-            this.OutCard = _card;
+            this.OutCard = this.RemoveCard(_card);
             this.DestDeck = _deck;
         }
 
@@ -214,7 +214,7 @@ namespace Yugioh_AtemReturns.Decks
             this.isListCardChanged = false;
             foreach (var item in ListCard)
             {
-                item.Update(_gameTime);
+                    item.Update(_gameTime);
                 if (this.isListCardChanged == true)
                     break;
             }
