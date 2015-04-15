@@ -29,19 +29,27 @@ namespace Yugioh_AtemReturns.GameObjects
         private Rectangle m_Bound;
         private float m_Timer = 0;
         //for Transforms
-        private Vector2 m_oldPosition;                                              //Move
+        //Move
+        private Vector2 m_oldPosition;                                              
         private Vector2 m_Velocity;                                     
-        private float m_moveDistance;                                               //Scale
+        private float m_moveDistance;                                               
+        //Scale
         private Vector2 speedScale;
-        private float scaleRatio;
-        private float scaleValue;                                                   //Rotate
+        private Vector2 scaleRatio;
+        private Vector2 scaleValue;                                                   
+        //Rotate
         private float oldRotation;
         private float rotateValue;
         private float speedRotate;
+        //FADE
+        private float speedFade;
+        private float fadeRatio;
+        private float currentFadePercent;
         //
         private List<MoveTo> _moveList = new List<MoveTo>();
         private List<RotateTo> _rotateList = new List<RotateTo>();
-        private List<ScaleTo> _scaleList = new List<ScaleTo>(); 
+        private List<ScaleTo> _scaleList = new List<ScaleTo>();
+        private List<Fade> _fadeList = new List<Fade>(); 
         #endregion
 
 
@@ -51,6 +59,7 @@ namespace Yugioh_AtemReturns.GameObjects
                 return (_moveList.Any() || _rotateList.Any() || _scaleList.Any());
                 }
         }//
+
         #region Properties
 
         public Texture2D Texture
@@ -207,6 +216,12 @@ namespace Yugioh_AtemReturns.GameObjects
             return contentManager.Load<Texture2D>(address);
         }
 
+        //TEST
+        public void SetSpriteWithName(ContentManager contentManager, String filename)
+        {
+            Texture = LoadContent(contentManager, filename);
+        }
+
         public void Draw(SpriteBatch spritebatch)
         {
             spritebatch.Draw(
@@ -253,7 +268,6 @@ namespace Yugioh_AtemReturns.GameObjects
                 {
                     _rotateList.Remove(_rotateList.First());
                 }
-                
             }
 
             //SCALE TO
@@ -268,6 +282,21 @@ namespace Yugioh_AtemReturns.GameObjects
                 else if (_scaleList.First().IsDone)
                 {
                     _scaleList.Remove(_scaleList.First());
+                }
+            }
+
+            //FADE
+            if (_fadeList.Any())
+            {
+                var first = _fadeList.First();
+
+                if (!_fadeList.First().IsDone)
+                {
+                    this.RunFade(ref first);
+                }
+                else if (_fadeList.First().IsDone)
+                {
+                    _fadeList.Remove(_fadeList.First());
                 }
             }
         }
@@ -307,10 +336,15 @@ namespace Yugioh_AtemReturns.GameObjects
                 if ((float)Math.Sqrt(m_Velocity.X * m_Velocity.X + m_Velocity.Y * m_Velocity.Y) > (m_moveDistance - distance))
                 {
                     //Nếu có thì gán vận tốc bằng quãng đường còn lại
-                    m_Velocity.X = nextposition.X - Position.X;
-                    m_Velocity.Y = nextposition.Y - Position.Y;
+                    //m_Velocity.X = nextposition.X - Position.X;
+                    //m_Velocity.Y = nextposition.Y - Position.Y;
+                    Position = new Vector2(nextposition.X, nextposition.Y);
                 }
-                Position = new Vector2(Position.X + m_Velocity.X, Position.Y + m_Velocity.Y);
+                else
+                {
+                    Position = new Vector2(Position.X + m_Velocity.X, Position.Y + m_Velocity.Y);
+                }
+                
             }
             else
             {
@@ -328,36 +362,52 @@ namespace Yugioh_AtemReturns.GameObjects
         
         private void RunScaleTo(ref ScaleTo scaleto)
         {
-            float time = scaleto.Time;
-            Vector2 newscale = scaleto.NextScale;
-
+            var time = scaleto.Time;
+            var newscale = scaleto.NextScale;
+            
             if(!scaleto.IsDoing)
             {
                 scaleto.IsDoing = true;
                 speedScale.X = (newscale.X - Scale.X) / (time * 60);
                 speedScale.Y = (newscale.Y - Scale.Y) / (time * 60);
 
-                scaleRatio = (float)Math.Sqrt(
-                                             (newscale.X - Scale.X) * (newscale.X - Scale.X) +
-                                             (newscale.Y - Scale.Y) * (newscale.Y - Scale.Y)
-                                             );
+                scaleRatio.X = Math.Abs(newscale.X - Scale.X);
+                scaleRatio.Y = Math.Abs(newscale.Y - Scale.Y);
+
+                scaleValue = Vector2.Zero;
             }
 
-            scaleValue += (float)Math.Sqrt(speedScale.X * speedScale.X + speedScale.Y*speedScale.Y);
+            scaleValue.X += speedScale.X;
+            scaleValue.Y += speedScale.Y;
 
-            if(scaleRatio > scaleValue && !scaleto.IsDone)
+            if(!scaleto.IsDone)
             {
-                if((Math.Abs(Scale.X - newscale.X) < speedScale.X) && (Math.Abs(Scale.Y - newscale.Y) < speedScale.Y))
+                if ((scaleRatio.X > Math.Abs(scaleValue.X)))
                 {
-                    speedScale.X = newscale.X - Scale.X;
-                    speedScale.Y = newscale.Y - Scale.Y;
+                    if (Math.Abs(scaleRatio.X - Math.Abs(scaleValue.X)) < Math.Abs(speedScale.X))
+                    {
+                        Scale = new Vector2(newscale.X, Scale.Y);
+                    }
+                    else
+                        Scale = new Vector2(Scale.X + speedScale.X, Scale.Y);
+                        
                 }
-                Scale = new Vector2(Scale.X + speedScale.X, Scale.Y + speedScale.Y);
-            }
-            else
-            {
-                scaleto.IsDone = true;
-                scaleto.IsDoing = false;
+
+                if (scaleRatio.Y > Math.Abs(scaleValue.Y))
+                {
+                    if (Math.Abs(scaleRatio.Y - Math.Abs(scaleValue.Y)) < Math.Abs(speedScale.Y))
+                    {
+                        Scale = new Vector2(Scale.X, newscale.Y);
+                    }
+                    else
+                        Scale = new Vector2(Scale.X, Scale.Y + speedScale.Y);
+                }
+
+                if (Math.Abs(Scale.X - newscale.X) <= 0 && Math.Abs(Scale.Y - newscale.Y) <= 0)
+                {
+                     scaleto.IsDone = true;
+                     scaleto.IsDoing = false;
+                }
             }
         }
 
@@ -379,20 +429,72 @@ namespace Yugioh_AtemReturns.GameObjects
                 rotateValue = rotateto - Rotation;
             }
 
-            float rotated = Rotation - oldRotation;
+            float rotated = Math.Abs(Rotation - oldRotation);
 
-            if (rotateValue > rotated && !newrotation.IsDone)
+            if (Math.Abs(rotateValue) > rotated && !newrotation.IsDone)
             {
-               if(Math.Abs(rotateto - rotated) < speedRotate)
-               {
-                   speedRotate = rotateto - Rotation;
-               }
-               Rotation += speedRotate;
+                if (Math.Abs(rotateto - rotated) < speedRotate)
+                {
+                    //speedRotate = rotateto - Rotation;
+                    Rotation = rotateto;
+                }
+                else
+                {
+                    Rotation += speedRotate;
+                }
+               
+               
             }
             else
             {
                 newrotation.IsDone = true;
                 newrotation.IsDoing = false;
+            }
+        }
+
+        public virtual void AddFade(Fade fade)
+        {
+            _fadeList.Add(fade);
+        }
+
+        private void RunFade(ref Fade newfade)
+        {
+            if (!newfade.IsDoing)
+            {
+                currentFadePercent = ((float)this.Color.A / 255);
+                if(newfade.FromPercent != currentFadePercent)
+                {
+                    newfade.FromPercent = currentFadePercent;
+                }
+
+                float time = newfade.Time;
+                newfade.IsDoing = true;
+                speedFade = (newfade.ToPercent - newfade.FromPercent) / (time * 60);
+                fadeRatio = (newfade.ToPercent - newfade.FromPercent);
+                if (this.Color == new Color(0,0,0,0))
+                {
+                    this.Color = new Color(1,1,1,1);
+                }
+            }
+
+            currentFadePercent += speedFade;
+
+            if (Math.Abs(fadeRatio) > Math.Abs(currentFadePercent - newfade.FromPercent) && !newfade.IsDone)
+            {
+                if (Math.Abs(newfade.ToPercent - Math.Abs(currentFadePercent)) < Math.Abs(speedFade))
+                {
+                    this.Color = Color.White * newfade.ToPercent;
+                }
+                else
+                {
+                    this.Color = Color.White * (currentFadePercent);
+                    
+                }
+            }
+            else
+            {
+                newfade.IsDone = true;
+                newfade.IsDoing = false;
             }
         }
 

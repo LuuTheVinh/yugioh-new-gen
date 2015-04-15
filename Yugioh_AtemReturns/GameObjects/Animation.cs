@@ -47,4 +47,16 @@ namespace Yugioh_AtemReturns.GameObjects
             NextRotation = nextrotation;
         }
     }
+
+    public class Fade : Animation
+    {
+        public float FromPercent { set; get; }
+        public float ToPercent { get; set; }
+        public Fade(float time, float frompercent = 1.0f, float tofrompercent = 0.0f)
+            : base(time)
+        {
+            FromPercent = frompercent;
+            ToPercent = tofrompercent;
+        }
+    }
 }

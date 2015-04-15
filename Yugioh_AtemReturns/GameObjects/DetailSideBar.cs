@@ -253,12 +253,23 @@ namespace Yugioh_AtemReturns.GameObjects
             if (Enum.TryParse("B" + cardid, false, out spriteId))
             {
                 this.CardPreview = new Sprite(SpriteManager.getInstance(contentManager).GetSprite(spriteId));
+				this.CardPreview.Position = new Vector2(this.Position.X + 5, this.Position.Y + 70);
             }
+
+            this.CardData = Cards.CardProvider.GetInstance().GetCardById(cardid);
+
+            this.Description = CardData != null ? CardData.Description : "";
+            this.Description = TextFormater.getIntance().WordWrap(font, this.Description, 170);
+
+            //Reset Position
+            descPosition = new Vector2(this.Position.X + 15, this.Position.Y + 375);
+            scrollBtn.Position = new Vector2(this.Position.X + 189, this.Position.Y + 381);
         }
 
         public void SetDefaultCardPreview()
         {
             this.CardPreview = new Sprite(SpriteManager.getInstance(contentManager).GetSprite(SpriteID.BBackSide));
+            this.CardPreview.Position = new Vector2(this.Position.X + 5, this.Position.Y + 70);
         }
     }
 }

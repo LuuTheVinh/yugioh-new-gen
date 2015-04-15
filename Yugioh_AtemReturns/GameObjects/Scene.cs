@@ -16,7 +16,7 @@ namespace Yugioh_AtemReturns.GameObjects
         virtual public void Init(Game game)
         {
             this.Game = game;
-            this.Game.Window.Title = "Yugioh!!! Atem Returns";
+            //this.Game.Window.Title = "Yugioh!!! Atem Returns";
         }
         virtual public void Update(GameTime gametime)
         {
