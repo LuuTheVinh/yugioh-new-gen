@@ -46,8 +46,8 @@ namespace Yugioh_AtemReturns.GameObjects
             textBoxRect = new Rectangle((int)descPosition.X, (int)descPosition.Y, 165, 140);
 
             //CARD DESCRIPTION LAY TRONG CARD DATA
-            //this.Description = "Dong thu nhat. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello.";
             this.Description = CardData != null ? CardData.Description : "";
+            //this.Description = "Dong thu nhat. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello. Hello.";
 
             this.Description = TextFormater.getIntance().WordWrap(font, this.Description, 170);
 
@@ -252,8 +252,7 @@ namespace Yugioh_AtemReturns.GameObjects
             SpriteID spriteId;
             if (Enum.TryParse("B" + cardid, false, out spriteId))
             {
-                this.CardPreview = new Sprite(SpriteManager.getInstance(contentManager).GetSprite(spriteId));
-				this.CardPreview.Position = new Vector2(this.Position.X + 5, this.Position.Y + 70);
+                this.CardPreview.Texture = SpriteManager.getInstance(contentManager).GetTexture(spriteId);
             }
 
             this.CardData = Cards.CardProvider.GetInstance().GetCardById(cardid);
@@ -268,8 +267,8 @@ namespace Yugioh_AtemReturns.GameObjects
 
         public void SetDefaultCardPreview()
         {
-            this.CardPreview = new Sprite(SpriteManager.getInstance(contentManager).GetSprite(SpriteID.BBackSide));
-            this.CardPreview.Position = new Vector2(this.Position.X + 5, this.Position.Y + 70);
+            this.CardPreview.Texture = SpriteManager.getInstance(contentManager).GetTexture(SpriteID.BBackSide);
+            this.Description = "";
         }
     }
 }
