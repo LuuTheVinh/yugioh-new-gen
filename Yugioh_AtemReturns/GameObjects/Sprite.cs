@@ -35,11 +35,11 @@ namespace Yugioh_AtemReturns.GameObjects
         private float m_moveDistance;                                               
         //Scale
         private Vector2 speedScale;
-        private Vector2 scaleRatio;
-        private Vector2 scaleValue;                                                   
+        private Vector2 scaleTotalValue;
+        private Vector2 scaledValue;                                                   
         //Rotate
         private float oldRotation;
-        private float rotateValue;
+        private float rotationTotalValue;
         private float speedRotate;
         //FADE
         private float speedFade;
@@ -51,7 +51,6 @@ namespace Yugioh_AtemReturns.GameObjects
         private List<ScaleTo> _scaleList = new List<ScaleTo>();
         private List<Fade> _fadeList = new List<Fade>(); 
         #endregion
-
 
         public bool IsAction
         {
@@ -244,14 +243,14 @@ namespace Yugioh_AtemReturns.GameObjects
             if (_moveList.Any())
             {
                 var first = _moveList.First();
-                
-                if (!_moveList.First().IsDone)
+
+                if (first.IsDone)
+                {
+                    _moveList.Remove(first);
+                }
+                else
                 {
                     this.RunMoveTo(ref first);
-                }
-                else if (_moveList.First().IsDone)
-                {
-                    _moveList.Remove(_moveList.First());
                 }
             }
 
@@ -260,13 +259,13 @@ namespace Yugioh_AtemReturns.GameObjects
             {
                 var first = _rotateList.First();
 
-                if (!_rotateList.First().IsDone)
+                if (first.IsDone)
+                {
+                    _rotateList.Remove(first);
+                }
+                else
                 {
                     this.RunRotateTo(ref first);
-                }
-                else if (_rotateList.First().IsDone)
-                {
-                    _rotateList.Remove(_rotateList.First());
                 }
             }
 
@@ -275,14 +274,15 @@ namespace Yugioh_AtemReturns.GameObjects
             {
                 var first = _scaleList.First();
 
-                if (!_scaleList.First().IsDone)
+                if (first.IsDone)
+                {
+                    _scaleList.Remove(first);
+                }
+                else
                 {
                     this.RunScaleTo(ref first);
                 }
-                else if (_scaleList.First().IsDone)
-                {
-                    _scaleList.Remove(_scaleList.First());
-                }
+                
             }
 
             //FADE
@@ -290,13 +290,13 @@ namespace Yugioh_AtemReturns.GameObjects
             {
                 var first = _fadeList.First();
 
-                if (!_fadeList.First().IsDone)
+                if (first.IsDone)
+                {
+                    _fadeList.Remove(first);
+                }
+                else
                 {
                     this.RunFade(ref first);
-                }
-                else if (_fadeList.First().IsDone)
-                {
-                    _fadeList.Remove(_fadeList.First());
                 }
             }
         }
@@ -312,6 +312,14 @@ namespace Yugioh_AtemReturns.GameObjects
         {
             float time = moveto.Time;
             Vector2 nextposition = moveto.NextPosition;
+
+            if (time == 0)
+            {
+                Position = nextposition;
+                moveto.IsDone = true;
+                moveto.IsDoing = false;
+                return;
+            }
 
             if(!moveto.IsDoing)
             {
@@ -330,7 +338,7 @@ namespace Yugioh_AtemReturns.GameObjects
             var distance = (float)Math.Sqrt(((Position.X - m_oldPosition.X) * (Position.X - m_oldPosition.X) +
                                         (Position.Y - m_oldPosition.Y) * (Position.Y - m_oldPosition.Y)));
             
-            if (m_moveDistance > distance && !moveto.IsDone)
+            if (m_moveDistance >= distance && !moveto.IsDone)
             {
                 //Kiểm tra lần di chuyển cuối cùng có vượt ra khỏi vị trí đích hay không
                 if ((float)Math.Sqrt(m_Velocity.X * m_Velocity.X + m_Velocity.Y * m_Velocity.Y) > (m_moveDistance - distance))
@@ -339,6 +347,8 @@ namespace Yugioh_AtemReturns.GameObjects
                     //m_Velocity.X = nextposition.X - Position.X;
                     //m_Velocity.Y = nextposition.Y - Position.Y;
                     Position = new Vector2(nextposition.X, nextposition.Y);
+                    moveto.IsDone = true;
+                    moveto.IsDoing = false;
                 }
                 else
                 {
@@ -350,7 +360,6 @@ namespace Yugioh_AtemReturns.GameObjects
             {
                 moveto.IsDone = true;
                 moveto.IsDoing = false;
-                m_oldPosition = Position;
             }
         }
 
@@ -364,6 +373,14 @@ namespace Yugioh_AtemReturns.GameObjects
         {
             var time = scaleto.Time;
             var newscale = scaleto.NextScale;
+
+            if (time == 0)
+            {
+                this.Scale = newscale;
+                scaleto.IsDone = true;
+                scaleto.IsDoing = false;
+                return;
+            }
             
             if(!scaleto.IsDoing)
             {
@@ -371,39 +388,43 @@ namespace Yugioh_AtemReturns.GameObjects
                 speedScale.X = (newscale.X - Scale.X) / (time * 60);
                 speedScale.Y = (newscale.Y - Scale.Y) / (time * 60);
 
-                scaleRatio.X = Math.Abs(newscale.X - Scale.X);
-                scaleRatio.Y = Math.Abs(newscale.Y - Scale.Y);
+                scaleTotalValue.X = Math.Abs(newscale.X - Scale.X);
+                scaleTotalValue.Y = Math.Abs(newscale.Y - Scale.Y);
 
-                scaleValue = Vector2.Zero;
+                scaledValue = Vector2.Zero;
             }
-
-            scaleValue.X += speedScale.X;
-            scaleValue.Y += speedScale.Y;
 
             if(!scaleto.IsDone)
             {
-                if ((scaleRatio.X > Math.Abs(scaleValue.X)))
+                if ((scaleTotalValue.X >= scaledValue.X))
                 {
-                    if (Math.Abs(scaleRatio.X - Math.Abs(scaleValue.X)) < Math.Abs(speedScale.X))
+                    if (Math.Abs(scaleTotalValue.X - scaledValue.X) < Math.Abs(speedScale.X))
                     {
                         Scale = new Vector2(newscale.X, Scale.Y);
                     }
                     else
+                    {
                         Scale = new Vector2(Scale.X + speedScale.X, Scale.Y);
-                        
+                        scaledValue.X += Math.Abs(speedScale.X);
+                    }
+
                 }
 
-                if (scaleRatio.Y > Math.Abs(scaleValue.Y))
+                if (scaleTotalValue.Y >= scaledValue.Y)
                 {
-                    if (Math.Abs(scaleRatio.Y - Math.Abs(scaleValue.Y)) < Math.Abs(speedScale.Y))
+                    if (Math.Abs(scaleTotalValue.Y - scaledValue.Y) < Math.Abs(speedScale.Y))
                     {
                         Scale = new Vector2(Scale.X, newscale.Y);
                     }
                     else
+                    {
                         Scale = new Vector2(Scale.X, Scale.Y + speedScale.Y);
+                        scaledValue.Y += Math.Abs(speedScale.Y);
+                    }
+                        
                 }
 
-                if (Math.Abs(Scale.X - newscale.X) <= 0 && Math.Abs(Scale.Y - newscale.Y) <= 0)
+                if (Scale.X == newscale.X && Scale.Y == newscale.Y)
                 {
                      scaleto.IsDone = true;
                      scaleto.IsDoing = false;
@@ -418,32 +439,39 @@ namespace Yugioh_AtemReturns.GameObjects
 
         private void RunRotateTo(ref RotateTo newrotation)
         {
-            float time = newrotation.Time;
-            float rotateto = newrotation.NextRotation * (float)Math.PI / 180;
+            var time = newrotation.Time;
+            var rotateto = newrotation.NextRotation * (float)Math.PI / 180;
+
+            if (time == 0)
+            {
+                this.Rotation = rotateto;
+                newrotation.IsDone = true;
+                newrotation.IsDoing = false;
+                return;
+            }
 
             if (!newrotation.IsDoing)
             {
                 newrotation.IsDoing = true;
                 oldRotation = Rotation;
                 speedRotate = (rotateto - Rotation) / (time * 60);
-                rotateValue = rotateto - Rotation;
+                rotationTotalValue = Math.Abs(rotateto - Rotation);
             }
 
-            float rotated = Math.Abs(Rotation - oldRotation);
+            var rotated = Math.Abs(Rotation - oldRotation);
 
-            if (Math.Abs(rotateValue) > rotated && !newrotation.IsDone)
+            if (rotationTotalValue >= rotated && !newrotation.IsDone)
             {
-                if (Math.Abs(rotateto - rotated) < speedRotate)
+                if (Math.Abs(rotationTotalValue - rotated) < Math.Abs(speedRotate))
                 {
-                    //speedRotate = rotateto - Rotation;
                     Rotation = rotateto;
+                    newrotation.IsDone = true;
+                    newrotation.IsDoing = false;
                 }
                 else
                 {
                     Rotation += speedRotate;
                 }
-               
-               
             }
             else
             {
@@ -459,6 +487,14 @@ namespace Yugioh_AtemReturns.GameObjects
 
         private void RunFade(ref Fade newfade)
         {
+            if (newfade.Time == 0)
+            {
+                this.Color = Color.White * newfade.ToPercent;
+                newfade.IsDone = true;
+                newfade.IsDoing = false;
+                return;
+            }
+
             if (!newfade.IsDoing)
             {
                 currentFadePercent = ((float)this.Color.A / 255);
@@ -477,18 +513,18 @@ namespace Yugioh_AtemReturns.GameObjects
                 }
             }
 
-            currentFadePercent += speedFade;
-
-            if (Math.Abs(fadeRatio) > Math.Abs(currentFadePercent - newfade.FromPercent) && !newfade.IsDone)
+            if (Math.Abs(fadeRatio) >= Math.Abs(currentFadePercent - newfade.FromPercent) && !newfade.IsDone)
             {
                 if (Math.Abs(newfade.ToPercent - Math.Abs(currentFadePercent)) < Math.Abs(speedFade))
                 {
                     this.Color = Color.White * newfade.ToPercent;
+                    newfade.IsDone = true;
+                    newfade.IsDoing = false;
                 }
                 else
                 {
+                    currentFadePercent += speedFade;
                     this.Color = Color.White * (currentFadePercent);
-                    
                 }
             }
             else

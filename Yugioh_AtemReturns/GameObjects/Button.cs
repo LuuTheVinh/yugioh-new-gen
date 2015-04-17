@@ -34,13 +34,21 @@ namespace Yugioh_AtemReturns.GameObjects
             set
             {
                 isSelected = value;
-                if (selectedImage != null) //ADD
-                    this.Sprite = selectedImage;
+                if (isSelected)
+                {
+                    if (selectedImage != null)
+                        this.Sprite = selectedImage;
+                }
+                else
+                {
+                    if (normalImage != null)
+                        this.Sprite = normalImage;
+                }
+                
             }
         }
-
+        public bool CanSelect { set; get; }
         public bool Clicked { set; get; }
-
         public bool IsRightClick
         {
             get
@@ -51,7 +59,6 @@ namespace Yugioh_AtemReturns.GameObjects
                 isRightClick = value;
             }
         }
-
         public bool Hovered {
             get { return isHovered; }
             set 
@@ -70,22 +77,24 @@ namespace Yugioh_AtemReturns.GameObjects
         {
             get
             {
-                return (selectedImage == null) ? normalImage : selectedImage;
+                return selectedImage ?? normalImage;
             }
         }
-
         public Sprite HoverImage
         {
             get
             {
-                return (hoverImage == null) ? normalImage : hoverImage;
+                return hoverImage ?? normalImage;
             }
         }
+
         #endregion
 
         public Button(Sprite image)
         {
             this.Sprite = image;
+            this.CanSelect = false;
+            this.isSelected = false;
         }
         public Button(Sprite normal, Sprite hover)
         {
@@ -93,6 +102,8 @@ namespace Yugioh_AtemReturns.GameObjects
             hoverImage = hover;
 
             this.Sprite = normalImage;
+            this.CanSelect = false;
+            this.isSelected = false;
         }
         public Button(Sprite normal, Sprite hover, Sprite selected)
         {
@@ -101,6 +112,8 @@ namespace Yugioh_AtemReturns.GameObjects
             selectedImage = selected;
 
             this.Sprite = normalImage;
+            this.CanSelect = true;
+            this.isSelected = false;
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -130,13 +143,17 @@ namespace Yugioh_AtemReturns.GameObjects
                 if (isHovered)
                 {
                     Debug.WriteLine(String.Format("{0},{1}", inputController.MousePosition.X, inputController.MousePosition.Y));
-                    this.isSelected = true;
+                    
+                    if(this.CanSelect)
+                        this.isSelected = true;
+                    
                     this.Clicked = true;
                     this.DoButtonEvent();
                 }
                 else
                 {
-                    this.isSelected = false;
+                    if (this.CanSelect)
+                        this.isSelected = false;
                 }
             }
 
@@ -163,6 +180,7 @@ namespace Yugioh_AtemReturns.GameObjects
                 }
                 isHovered = true;
             }
+
             if (!this.Sprite.Bound.Contains(inputController.MousePosition))
             {
                 isHovered = false;
@@ -172,17 +190,16 @@ namespace Yugioh_AtemReturns.GameObjects
                 }
             }
 
-            if (isSelected)
+            if (isSelected && this.CanSelect)
             {
                 if (selectedImage != null)
                 {
                     this.Sprite = selectedImage;
                 }
-                else//
+                else if (normalImage != null)
                 {
-                    if (normalImage != null)
-                        this.Sprite = normalImage;
-                }//ADD
+                    this.Sprite = normalImage;
+                }
             }
 
             inputController.End(); //End get inputController
@@ -199,7 +216,6 @@ namespace Yugioh_AtemReturns.GameObjects
             if (RightClick != null)
                 RightClick();
         }
-
         private void UpdateProperties()
         {
             if (normalImage != null && Sprite != null)
