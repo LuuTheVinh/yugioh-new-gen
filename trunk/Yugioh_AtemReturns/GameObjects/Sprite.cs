@@ -139,7 +139,9 @@ namespace Yugioh_AtemReturns.GameObjects
             {
                 if (value == m_maxFrameW)
                     m_curFrameW = 0;
-                m_curFrameW = value;
+                else
+                    m_curFrameW = value;
+                this.Frame = new Rectangle(value * this.Frame.Width, this.Frame.Y, this.Frame.Width, this.Frame.Height);
             }
         }
         private int MaxFrameW
@@ -154,7 +156,9 @@ namespace Yugioh_AtemReturns.GameObjects
             {
                 if (value == m_maxFrameH)
                     m_curFrameH = 0;
-                m_curFrameH = value;
+                else
+                    m_curFrameH = value;
+                this.Frame = new Rectangle(this.Frame.X, value * this.Frame.Height, this.Frame.Width, this.Frame.Height);
             }
         }
         private int MaxFrameH
@@ -196,13 +200,13 @@ namespace Yugioh_AtemReturns.GameObjects
             Texture = sprite.Texture;
             Bound = sprite.Bound;
             Color = sprite.Color;
-            CurFrameH = sprite.CurFrameH;
-            CurFrameW = sprite.CurFrameW;
             Depth = sprite.Depth;
             Effect = sprite.Effect;
             Frame = sprite.Frame;
             MaxFrameH = sprite.MaxFrameH;
             MaxFrameW = sprite.MaxFrameW;
+            CurFrameH = sprite.CurFrameH;
+            CurFrameW = sprite.CurFrameW; 
             Origin = sprite.Origin;
             Position = sprite.Position;
             Rotation = sprite.Rotation;
