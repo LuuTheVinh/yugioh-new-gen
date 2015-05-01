@@ -90,7 +90,7 @@ namespace Yugioh_AtemReturns.Scenes
         {
             if (_duelist.IsTurn == false)
                 return;
-            if (_duelist.DuelistID == Decks.ePlayerId.COMPUTER)
+            if (_duelist.DuelistID == ePlayerId.COMPUTER)
             {
                 foreach (var bt in buttons)
                 {
@@ -102,11 +102,9 @@ namespace Yugioh_AtemReturns.Scenes
             {
                 button.NormalImage.Frame = new Rectangle(0,frameY,25,75);
             }
-            try
-            {
-                buttons[Convert.ToInt32(_duelist.Phase) - 1].NormalImage.Frame = new Rectangle(40, frameY, 25, 75);
-            }
-            catch { }
+
+            buttons[Math.Max(0,Convert.ToInt32(_duelist.Phase) - 1)].NormalImage.Frame = new Rectangle(40, frameY, 25, 75);
+
             
         }
 

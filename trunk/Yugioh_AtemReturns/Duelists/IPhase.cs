@@ -18,7 +18,7 @@ namespace Yugioh_AtemReturns.Duelists
         /// </summary>
         /// <param name="_player"></param>
         /// <param name="_computer"></param>
-        void Begin(Player _player, Computer _computer);
+        void Begin(Player _player, Computer _computer, ePlayerId _id);
 
         // Gỡ bỏ các event 
         void End(Player _player, Computer _computer);

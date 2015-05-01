@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace Yugioh_AtemReturns.GameObjects
 {
-    class Timer
+    public class Timer
     {
         public double TotalGameTime { get; private set; }
         public double ElapseGameTime { get; private set; }

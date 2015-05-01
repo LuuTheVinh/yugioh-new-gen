@@ -61,7 +61,7 @@ namespace Yugioh_AtemReturns {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("12, 0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4, 0")]
         public global::Microsoft.Xna.Framework.Vector2 HandDistance {
             get {
                 return ((global::Microsoft.Xna.Framework.Vector2)(this["HandDistance"]));
@@ -110,6 +110,45 @@ namespace Yugioh_AtemReturns {
         public global::Microsoft.Xna.Framework.Vector2 PhaseSpace {
             get {
                 return ((global::Microsoft.Xna.Framework.Vector2)(this["PhaseSpace"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8000")]
+        public int MaxLP {
+            get {
+                return ((int)(this["MaxLP"]));
+            }
+            set {
+                this["MaxLP"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("15, 570")]
+        public global::Microsoft.Xna.Framework.Vector2 LPBAR {
+            get {
+                return ((global::Microsoft.Xna.Framework.Vector2)(this["LPBAR"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500, 475")]
+        public global::Microsoft.Xna.Framework.Vector2 LP_Change {
+            get {
+                return ((global::Microsoft.Xna.Framework.Vector2)(this["LP_Change"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("65, 535")]
+        public global::Microsoft.Xna.Framework.Vector2 LifePointNum {
+            get {
+                return ((global::Microsoft.Xna.Framework.Vector2)(this["LifePointNum"]));
             }
         }
     }

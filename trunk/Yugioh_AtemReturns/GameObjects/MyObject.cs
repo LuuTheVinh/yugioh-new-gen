@@ -15,7 +15,7 @@ namespace Yugioh_AtemReturns.GameObjects
         private Sprite m_Sprite;
         private ID m_Id;
         private STATUS m_Status;
-
+        protected Timer m_timer;
         #region Properties
         public Sprite Sprite
         {
@@ -76,12 +76,14 @@ namespace Yugioh_AtemReturns.GameObjects
             Sprite = new Sprite(SpriteManager.getInstance(_content).GetSprite(_spriteid));
             Status = STATUS.NORMAL;
             ID = _id;
+            m_timer = new Timer();
 
         }
         protected MyObject()
         {
             Sprite = null;
             Status = STATUS.NORMAL;
+            m_timer = new Timer();
         }
         protected virtual void SetFrame()
         {
@@ -96,6 +98,7 @@ namespace Yugioh_AtemReturns.GameObjects
         {
             //
             Sprite.Update(gameTime);
+            m_timer.Update(gameTime);
         }
 
         public virtual void Draw(SpriteBatch _spritebatch)

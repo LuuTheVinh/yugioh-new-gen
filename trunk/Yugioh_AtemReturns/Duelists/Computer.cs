@@ -21,6 +21,7 @@ namespace Yugioh_AtemReturns.Duelists
         private eDeckName m_deckName;
         private string m_deckId_dbo;
         private AI m_Ai_logics;
+        LinkedList<Card> tributemonster; // là danh sách monster bị tribute
         public eDeckName DeckName
         {
             get { return m_deckName; }
@@ -37,35 +38,7 @@ namespace Yugioh_AtemReturns.Duelists
                 }
             }
         }
-
-        public ePlayerStatus Status
-        {
-            get
-            {
-                return m_status;
-            }
-            set
-            {
-                m_status = value;
-                switch (value)
-                {
-                    case ePlayerStatus.IDLE:
-                        SummonBuffer = null;
-                        break;
-                    case ePlayerStatus.WAITFORTRIBUTE:
-
-                        break;
-                    case ePlayerStatus.SUMONNING:
-                        this.CurNormalSummon--;
-                        Hand.SendTo(SummonBuffer, eDeckId.MONSTERFIELD);
-                        this.Status = ePlayerStatus.IDLE;
-                        this.Phase = ePhase.END;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
+        public Card TributeMonster { get; set; }
         public Computer() : base(ePlayerId.COMPUTER) { }
         public override void Init()
         {
@@ -104,26 +77,20 @@ namespace Yugioh_AtemReturns.Duelists
            // MonsterField.AddTop(new Monster(_content, "1002"));
 
             this.DeckName =(eDeckName) Rnd.Rand(0, Enum.GetValues(typeof(eDeckName)).Length - 1);
-            this.MainDeck.CreateDeck(_content, m_deckId_dbo);
-            
+            this.MainDeck.Init(_content, m_deckId_dbo);
+            this.GraveYard.Init(_content);
+            this.LifePoint = GlobalSetting.Default.MaxLP;
+            this.m_numsprite.Position = ComputerSetting.Default.LifePointNum;
+            this.Lp_change.Position = ComputerSetting.Default.LP_Change;
         }
+
         public override void Update(Microsoft.Xna.Framework.GameTime gametime)
         {
             base.Update(gametime);
             switch (Phase)
             {
                 case ePhase.STARTUP:
-                    if (this.IsTurn == false)
-                        break;
-                    if (this.Hand.IsAction == true)
-                        break;
-                    if (Hand.Count == 5)
-                    {
-                        Phase = ePhase.END;
-                    }
-                    else
-                        MainDeck.DrawCard();
-                    
+                    this.StartupPhase();
                     break;
                 case ePhase.DRAW:
                     if (this.IsTurn == false)
@@ -135,24 +102,70 @@ namespace Yugioh_AtemReturns.Duelists
                     if (this.IsTurn == false)
                         break;
                     Phase = ePhase.MAIN1;
+                    this.CurNormalSummon = this.MaxNormalSummon;
                     break;
                 case ePhase.MAIN1:
-                    this.m_Ai_logics.Update(PlayScene.Player, this);
                     if (this.Hand.IsAction == true)
                         break;
-                    this.SummonBuffer = m_Ai_logics.Summon(PlayScene.Player, this);
-                    if (SummonBuffer == null)
+
+                    if (this.Status == ePlayerStatus.IDLE)
                     {
-                        this.Phase = ePhase.END;
+                        if (CurNormalSummon != 0)
+                        {
+                            this.SummonBuffer = this.m_Ai_logics.Summon(PlayScene.Player, this);
+                        }
+                        else
+                        {
+                            if (this.MonsterField.ListCard.Any(card => (card as Monster).CanATK))
+                            {
+                                if (this.IsAction == false)
+                                this.Phase = ePhase.BATTLE;
+                            }else
+                            this.Phase = ePhase.END;
+                            break;
+                        }
+                        if (SummonBuffer == null)
+                        {
+                            this.Phase = ePhase.END;
+                            break;
+                        }
+                        int tri = RequireTributer[(SummonBuffer as Monster).Level - 1];
+
+                        tributemonster = new LinkedList<Card>(this.m_Ai_logics.Tribute(this, tri));
+
+                        if (tri > 0)
+                            this.Status = ePlayerStatus.WAITFORTRIBUTE;
+                        else
+                        {
+                            this.Status = ePlayerStatus.SUMONNING;
+                            break;
+                        }
                     }
-                    else
+                    if (this.Status == ePlayerStatus.WAITFORTRIBUTE)
                     {
-                        //this.SummonBuffer.STATUS = STATUS.ATK;
-                        (SummonBuffer as Monster).BattlePosition = eBattlePosition.ATK;
-                        this.Status = ePlayerStatus.SUMONNING;
+                        if (tributemonster.Any() == false)
+                        {
+                            this.Status = ePlayerStatus.SUMONNING;
+                            break;
+                        }
+                        tributemonster.First().STATUS = STATUS.TRIBUTE;
+                        (tributemonster.First() as Monster).CanATK = false;
+                        this.Tribute(tributemonster.First());
+                        tributemonster.RemoveFirst();
                     }
+                    tribute = 0;
+
                     break;
                 case ePhase.BATTLE:
+                    if (this.MonsterField.IsAction == true) break;
+                    if (this.MonsterField.ListCard.Any(card => (card as Monster).CanATK))
+                    {
+                        if (PlayScene.battlePhase.Step == eBattleStep.ENDPHASE) 
+                            PlayScene.battlePhase.Begin(PlayScene.Player, this, ePlayerId.COMPUTER);
+                    }
+                    else{
+                        this.Phase = ePhase.END;
+                    }
                     break;
                 case ePhase.MAIN2:
                     break;
@@ -191,9 +204,7 @@ namespace Yugioh_AtemReturns.Duelists
 
                     break;
                 case eBattlePosition.ATK:
-                    //e.Card.Position = new Vector2(
-                    //    sender.Position.X - ((MonsterField)sender).CurrentSlot * ComputerSetting.Default.FieldSlot.X + 13,
-                    //    sender.Position.Y + 15);
+
                     e.Card.AddMoveTo(new MoveTo(0.3f,new Vector2(
                         sender.Position.X - ((MonsterField)sender).CurrentSlot * ComputerSetting.Default.FieldSlot.X + 13,
                         sender.Position.Y + 15)));
@@ -277,38 +288,54 @@ namespace Yugioh_AtemReturns.Duelists
             if (count == 0) return;
 
             Vector2[] _position = new Vector2[sender.Count];
-            _position[0] = new Vector2(
-                    GlobalSetting.Default.CenterField.X - (sender.ListCard.First.Value.Sprite.Bound.Width + GlobalSetting.Default.HandDistance.X) * count / 2,
-                    sender.Position.Y - sender.ListCard.First.Value.Sprite.Bound.Height);
-            for (int i = 1; i < _position.Length; i++)
+            if (count <= 6)
             {
-                _position[i] = new Vector2(
-                    _position[i - 1].X + sender.ListCard.First.Value.Sprite.Bound.Width + GlobalSetting.Default.HandDistance.X,
-                    sender.Position.Y - sender.ListCard.First.Value.Sprite.Bound.Height);
+                _position[0] = new Vector2(
+                        GlobalSetting.Default.CenterField.X - (sender.ListCard.First.Value.Sprite.Bound.Width + GlobalSetting.Default.HandDistance.X) * count / 2,
+                        sender.Position.Y - sender.ListCard.First.Value.Sprite.Bound.Height);
+                for (int i = 1; i < _position.Length; i++)
+                {
+                    _position[i] = new Vector2(
+                        _position[i - 1].X + sender.ListCard.First.Value.Sprite.Bound.Width + GlobalSetting.Default.HandDistance.X,
+                        sender.Position.Y - sender.ListCard.First.Value.Sprite.Bound.Height);
+                }
             }
+            else
+            {
+                _position[0] = new Vector2(297, ComputerSetting.Default.Hand.Y - Hand.ListCard.First.Value.Sprite.Bound.Height);
+                int dis = 410 / (count - 1);
+                for (int i = 1; i < count ; i++)
+                {
+                    _position[i] = new Vector2(
+                        _position[i - 1].X + dis,
+                        _position[i - 1].Y);
+                }
+            }//else
+            e.Card.Sprite.WaitFor(this.MainDeck.Backside);
             sender.ListCard.Last.Value.AddMoveTo(new MoveTo(0.5f, _position[0]));
             int j = 1;
-            //sender.ListCard.Last.Value.Position = new Vector2(
-            //        GlobalSetting.Default.CenterField.X - (sender.ListCard.First.Value.Sprite.Bound.Width + GlobalSetting.Default.HandDistance.X) * count / 2,
-            //        sender.Position.Y - sender.ListCard.First.Value.Sprite.Bound.Height);
+            
             LinkedListNode<Card> node = sender.ListCard.Last.Previous;
             while (node != null)
             {
-                //node.Value.Position = new Vector2(
-                //    node.Next.Value.Sprite.Bound.Right + GlobalSetting.Default.HandDistance.X,
-                //    sender.Position.Y - sender.ListCard.First.Value.Sprite.Bound.Height);
                 node.Value.AddMoveTo(new MoveTo(0.5f,_position[j++]));                
                 node = node.Previous;
             }
         }
         private void Hand_CardAdded_ScaleCard(Deck sender, CardEventArgs e)
         {
-             e.Card.Scale = new Vector2(1.5f);
+            float dep = (float)1 / this.Hand.Count;
+            int i = 0;
+            foreach (var card in Hand.ListCard)
+            {
+                card.Sprite.Depth = dep * i++;
+            }
+            e.Card.Scale = new Vector2(1.5f);
         }
         private void Hand_CardRemoved_ScaleCard(Deck sender, CardEventArgs e)
         {
+            e.Card.Sprite.Depth = 1.0f;
             e.Card.AddScaleTo(new ScaleTo(0.5f, new Vector2(1.0f)));
-
         }
 
         private void Hand_CardLeftClick(Card sender, EventArgs e)
@@ -319,6 +346,17 @@ namespace Yugioh_AtemReturns.Duelists
         }
         private void Hand_CardOnHover(Card sender, EventArgs e)
         {
+            if (sender.IsAction)
+                return;
+            if (this.Hand.Count >= 6)
+            {
+                var card = this.Hand.ListCard.Find(sender).Previous;
+                if (card != null)
+                    if (card.Value.Button.Hovered == true)
+                    {
+                        card.Value.outHovered(EventArgs.Empty);
+                    }
+            }
             if (sender.IsAction)
                 return; 
             sender.Position = new Vector2(
@@ -337,17 +375,27 @@ namespace Yugioh_AtemReturns.Duelists
         #region GraveYard Implement Event
         private void GraveYard_CardAdded(Deck sender, CardEventArgs e)
         {
-            //e.Card.STATUS = STATUS.ATK;
+            if ((e.Card as Monster).BattlePosition == eBattlePosition.DEF)
+                e.Card.Sprite.Rotation = 0f;
+            if (e.Card.STATUS == STATUS.TRIBUTE)
+            {
+                e.Card.Sprite.Origin = new Vector2(e.Card.Sprite.Size.X, e.Card.Sprite.Size.Y);
+                e.Card.Sprite.Position += e.Card.Sprite.Origin;
+            }
             (e.Card as Monster).BattlePosition = eBattlePosition.ATK;
-            //if ((sender as Deck).Count < 16)
-            //    e.Card.Position = ComputerSetting.Default.GraveYard - new Vector2(((sender as Deck).Count - 1) / 2);
-            //else
-            //    e.Card.Position = ComputerSetting.Default.GraveYard;
+
         }
         private void GraveYard_CardRemove(Deck sender, CardEventArgs e)
         {
 
         }
         #endregion
+
+
+
+        public void SelectMonsterATK(BattlePhase _battlephase)
+        {
+            this.m_Ai_logics.SelectATK(_battlephase,PlayScene.Player, this);
+        }
     }
 }

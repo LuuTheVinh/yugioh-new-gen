@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Yugioh_AtemReturns.Cards;
 using System;
+using Yugioh_AtemReturns.Duelists;
 
 namespace Yugioh_AtemReturns.Decks
 {
@@ -29,15 +30,20 @@ namespace Yugioh_AtemReturns.Decks
         }
         public override void Update(GameTime _gameTime)
         {
-            base.Update(_gameTime);
-
+            //base.Update(_gameTime);
+            this.isListCardChanged = false;
+            foreach (var item in ListCard.OrderBy(card => card.Sprite.Depth))
+            {
+                item.Update(_gameTime);
+                if (this.isListCardChanged == true)
+                    break;
+            }
+            
         }
         public override void Draw(SpriteBatch _spriteBatch)
         {
             _spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend);
             base.Draw(_spriteBatch);
-
-            
             _spriteBatch.End();
 
         }

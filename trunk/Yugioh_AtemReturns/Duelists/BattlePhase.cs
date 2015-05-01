@@ -27,19 +27,24 @@ namespace Yugioh_AtemReturns.Duelists
     class BattlePhase :IPhase
     {
         private LinkedList<Card> _list_monsterATK;
-        private Monster monsterATK;
-        private Monster monsterBeATK;
-        private eBattleStep m_step;
 
+        public LinkedList<Card> List_monsterATK
+        {
+            get { return _list_monsterATK; }
+            set { _list_monsterATK = value; }
+        }
+        private Monster[] monster = new Monster[2];
+        readonly bool[] isdestroy = new bool[2];
+        private eBattleStep m_step;
+        private ePlayerId m_playerTurn;
         private BattleSword battleSword;
         private Timer m_timer;
-
         public Monster MonsterATK
         {
-            get { return monsterATK; }
+            get { return monster[0]; }
             set
             {
-                monsterATK = value;
+                monster[0] = value;
                 if (value != null)
                 {
                     this.battleSword.Show(value);
@@ -65,10 +70,10 @@ namespace Yugioh_AtemReturns.Duelists
         }
         public Monster MonsterBeATK
         {
-            get { return monsterBeATK; }
+            get { return monster[1]; }
             set
             {
-                monsterBeATK = value;
+                monster[1] = value;
                 if (value != null)
                 {
                     //PlayScene.BattleSword.AttackTo(value);
@@ -103,11 +108,11 @@ namespace Yugioh_AtemReturns.Duelists
         {
             if (this.Step == eBattleStep.ENDPHASE)
                 return;
+            this.checkEndphase(_player, _computer);
 
-            if (_player.Phase != ePhase.BATTLE)
-                this.Step = eBattleStep.ENDPHASE;
-
+#if DEBUG
             System.Diagnostics.Debug.WriteLine(this.Step.ToString());
+#endif
             switch (this.Step)
             {
                 case eBattleStep.START_STEP:
@@ -115,26 +120,55 @@ namespace Yugioh_AtemReturns.Duelists
                     this.MonsterATK = null;
                     this.MonsterBeATK = null;
                     this.LoseMonster = null;
+                    this.isdestroy[0] = false;
+                    this.isdestroy[1] = false;
                     this.Step = eBattleStep.BATTLE_STEP;
                     m_timer.ResetStopWatch();
                     break;
                 case eBattleStep.BATTLE_STEP:
-                    if (MonsterATK == null)
-                        break;
-                    battleSword.Update(_player);
 
-                    if (_computer.MonsterField.Count == 0) // Trường hợp đối thủ không có bài trên sân
+                    if (this.m_playerTurn == ePlayerId.PLAYER)
                     {
-                        battleSword.DirectAtk(_computer);
+                        //wait event click
+                        //...
+                        if (MonsterATK == null)
+                            break;
+                        battleSword.Update(_player);
+
+                        if (_computer.MonsterField.Count == 0) // Trường hợp đối thủ không có bài trên sân
+                        {
+                            battleSword.DirectAtk(_computer);
+                            this.Step = eBattleStep.START_DS;
+                            break;
+                        }
+
+                        if (MonsterBeATK != null) // Trường hợp chọn được lá bị tấn công
+                        {
+                            this.Step = eBattleStep.START_DS;
+                            break;
+                        }
+                    }
+                    else//com turn
+                    {
+                        if (MonsterATK == null)
+                        {
+                            //chọn lá tấn công cho computer
+                            _computer.SelectMonsterATK(this);
+                        }
+                        if (this.MonsterATK == null)
+                        {
+                            _computer.Phase = ePhase.END;
+                            this.Step = eBattleStep.ENDPHASE;
+                            break;
+                        }
+                        if (_player.MonsterField.Count == 0) // Trường hợp đối thủ không có bài trên sân
+                        {
+                            battleSword.DirectAtk(_player);
+                        }
                         this.Step = eBattleStep.START_DS;
                         break;
                     }
 
-                    if (MonsterBeATK != null && MonsterBeATK != null) // Trường hợp chọn được lá bị tấn công
-                    {
-                        this.Step = eBattleStep.START_DS;
-                        break;
-                    }
                     break;
                 case eBattleStep.START_DS:
                     if (battleSword.IsAction == false)
@@ -161,21 +195,44 @@ namespace Yugioh_AtemReturns.Duelists
                 case eBattleStep.DURING_DS:
                     if (MonsterBeATK != null)
                     {
-                        if (this.MonsterBeATK.BattlePosition == eBattlePosition.ATK)
-                        //if (this.MonsterBeATK.STATUS == STATUS.ATK)
+                        if (this.MonsterBeATK.BattlePosition == eBattlePosition.DEF)
                         {
-
-                            if (MonsterATK.Atk < monsterBeATK.Atk)
+                            if (MonsterATK.Atk > MonsterBeATK.Def)
+                            {
+                                this.isdestroy[1] = true;
+                            }
+                            if (MonsterATK.Atk < MonsterBeATK.Def)
+                            {
                                 this.LoseMonster = MonsterATK;
-                            if (MonsterATK.Atk > MonsterBeATK.Atk)
+                                this.DamageCalculate(_player, _computer,  MonsterBeATK.Def - MonsterATK.Atk);
+                                this.LoseMonster = null;
+                            }
+                        }
+                        else
+                        {
+                            int dif = MonsterATK.Atk - MonsterBeATK.Atk;
+                            if (dif < 0)
+                            {
+                                this.isdestroy[0] = true;
+                                this.LoseMonster = MonsterATK;
+                            }
+                            if (dif > 0)
+                            {
+                                this.isdestroy[1] = true;
                                 this.LoseMonster = MonsterBeATK;
+                            }
+                            if (dif == 0)
+                            {
+                                this.isdestroy[0] = true;
+                                this.isdestroy[1] = true;
+                            }
+                            this.DamageCalculate(_player, _computer, dif);
                         }
                     }
-
-                    //else
-                    //{
-                    //    this.LoseMonster = (MonsterATK.Atk < MonsterBeATK.Def) ? MonsterATK : MonsterBeATK;
-                    //}
+                    else
+                    {
+                        AtkDirectly(_player, _computer);
+                    }
                     this.Step = eBattleStep.AFTER_DS;
                     break;
                 case eBattleStep.AFTER_DS:
@@ -183,37 +240,52 @@ namespace Yugioh_AtemReturns.Duelists
                     this.Step = eBattleStep.END_DS;
                     break;
                 case eBattleStep.END_DS:
-                    if (this.LoseMonster == null)
-                    {
-                        this.Step = eBattleStep.END_STEP;
-                        break;
-                    }
-                    if (this.LoseMonster.IsAction == true)
-                        break;
 
-                    if (object.ReferenceEquals(this.LoseMonster,this.MonsterATK))
+                    for (int i = 0; i < 2; i++)
                     {
-                        this.LoseMonster.LeftClick -= new CardLeftClickEventHandle(player_card_LeftClick);
-                        _player.MonsterField.SendTo(this.LoseMonster, eDeckId.GRAVEYARD);
-                        this.LoseMonster.AddMoveTo(new MoveTo(0.5f, GlobalSetting.Default.PlayerGrave));
-                        this.LoseMonster = null;
-                        this.Step = eBattleStep.END_STEP;
+                        if (isdestroy[i] == true)
+                        {
+                            LoseMonster = monster[i];
+                        }
+                        else
+                            continue;
+                        if (this.LoseMonster.IsAction == true)
+                            break;
+                        if (_player.MonsterField.ListCard.Contains(LoseMonster))
+                        {
+                            this.LoseMonster.LeftClick -= new CardLeftClickEventHandle(player_card_LeftClick);
+                            _player.MonsterField.SendTo(this.LoseMonster, eDeckId.GRAVEYARD);
+                            this.LoseMonster.AddMoveTo(new MoveTo(0.5f, GlobalSetting.Default.PlayerGrave));
+                            this.LoseMonster = null;
+                            this.Step = eBattleStep.END_STEP;
+                        }
+                        if (_computer.MonsterField.ListCard.Contains(LoseMonster))
+                        {
+                            this.LoseMonster.LeftClick -= new CardLeftClickEventHandle(computer_card_LeftClick);
+                            _computer.MonsterField.SendTo(this.LoseMonster, eDeckId.GRAVEYARD);
+                            this.LoseMonster.AddMoveTo(new MoveTo(0.5f, ComputerSetting.Default.GraveYard));
+                            this.LoseMonster = null;
+                            this.Step = eBattleStep.END_STEP;
+                        }
+
                     }
-                    if (object.ReferenceEquals(this.LoseMonster, this.MonsterBeATK))
-                    {
-                        this.LoseMonster.LeftClick -= new CardLeftClickEventHandle(player_card_LeftClick);
-                        _computer.MonsterField.SendTo(this.LoseMonster, eDeckId.GRAVEYARD);
-                        this.LoseMonster.AddMoveTo(new MoveTo(0.5f,ComputerSetting.Default.GraveYard));
-                        this.LoseMonster = null;
-                        this.Step = eBattleStep.END_STEP;
-                    }
+
+                    this.Step = eBattleStep.END_STEP;
                     break;
+
                 case eBattleStep.END_STEP:
+                    //if (this.MonsterATK == null)
+                    //{
+                    //    this.Step = eBattleStep.START_STEP;
+                    //    break;
+                    //}
+                    if (_player.IsAction || _computer.IsAction)
+                        break;
+                    this.MonsterATK.CanATK = false;
                     this.MonsterATK.LeftClick -= player_card_LeftClick;
-                    this._list_monsterATK.Remove(this.MonsterATK);
+                    this.List_monsterATK.Remove(this.MonsterATK);
                     this.MonsterATK.SwitchBattlePosition = false;
                     this.Step = eBattleStep.START_STEP;
-
                     break;
                 case eBattleStep.ENDPHASE:
                     //active some card effect
@@ -224,25 +296,55 @@ namespace Yugioh_AtemReturns.Duelists
             }
         }
 
+        private void checkEndphase(Player _player, Computer _computer)
+        {
+            if (this.m_playerTurn == ePlayerId.PLAYER)
+            {
+                if (_player.Phase != ePhase.BATTLE)
+                    this.Step = eBattleStep.ENDPHASE;
+            }
+            else
+            {
+                if (_computer.Phase != ePhase.BATTLE)
+                    this.Step = eBattleStep.ENDPHASE;
+            }
+        }
+
         public void Draw(SpriteBatch _spriteBatch)
         {
             battleSword.Draw(_spriteBatch);
         }
-        public void Begin(Player _player, Computer _computer)
+
+        public void Begin(Player _player, Computer _computer, ePlayerId _id)
         {
             this.Step = eBattleStep.START_STEP;
-            foreach (var card in _player.MonsterField.ListCard)
+            this.m_playerTurn = _id;
+            if (m_playerTurn == ePlayerId.PLAYER)
             {
-                if ((card as Monster).CanATK)
+                foreach (var card in _player.MonsterField.ListCard)
                 {
-                    _list_monsterATK.AddLast(card);
-                    card.LeftClick += new CardLeftClickEventHandle(player_card_LeftClick);
+                    if ((card as Monster).CanATK)
+                    {
+                        List_monsterATK.AddLast(card);
+                        card.LeftClick += new CardLeftClickEventHandle(player_card_LeftClick);
+                    }
+                }
+                foreach (var card in _computer.MonsterField.ListCard)
+                {
+                    card.LeftClick += new CardLeftClickEventHandle(computer_card_LeftClick);
                 }
             }
-            foreach (var card in _computer.MonsterField.ListCard)
+            else
             {
-                card.LeftClick += new CardLeftClickEventHandle(computer_card_LeftClick);
+                foreach (var card in _computer.MonsterField.ListCard)
+                {
+                    if ((card as Monster).CanATK)
+                    {
+                        List_monsterATK.AddLast(card);
+                    }
+                }
             }
+
         }
         public void End(Player _player, Computer _computer)
         {
@@ -255,7 +357,7 @@ namespace Yugioh_AtemReturns.Duelists
             {
                 card.LeftClick -= new CardLeftClickEventHandle(computer_card_LeftClick);
             }
-            _list_monsterATK.Clear();
+            List_monsterATK.Clear();
         }
                 
         private void player_card_LeftClick(Card sender, EventArgs e)
@@ -285,6 +387,34 @@ namespace Yugioh_AtemReturns.Duelists
             set
             {
                 m_step = value;
+            }
+        }
+
+        private void DamageCalculate(Player _player, Computer _computer, int _dif)
+        {
+            if (_player.MonsterField.ListCard.Contains(LoseMonster))
+            {
+                _player.Lp_change.Position = LoseMonster.Position;
+                _player.LifePoint -= Math.Abs(_dif);
+            }
+            if (_computer.MonsterField.ListCard.Contains(LoseMonster))
+            {
+                _computer.Lp_change.Position = LoseMonster.Position;
+                _computer.LifePoint -= Math.Abs(_dif);
+            }
+        }
+
+        private void AtkDirectly(Player _player, Computer _computer)
+        {
+            if (_player.MonsterField.ListCard.Contains(MonsterATK))
+            {
+                _computer.Lp_change.Position = ComputerSetting.Default.LP_Change;
+                _computer.LifePoint -= MonsterATK.Atk;
+            }
+            if (_computer.MonsterField.ListCard.Contains(MonsterATK))
+            {
+                _player.Lp_change.Position = GlobalSetting.Default.LP_Change;
+                _player.LifePoint -= MonsterATK.Atk;
             }
         }
     }

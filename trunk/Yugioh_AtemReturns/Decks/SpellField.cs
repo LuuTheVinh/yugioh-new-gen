@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Yugioh_AtemReturns.Cards;
 using Microsoft.Xna.Framework;
+using Yugioh_AtemReturns.Duelists;
 
 namespace Yugioh_AtemReturns.Decks
 {

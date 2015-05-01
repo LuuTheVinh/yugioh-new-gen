@@ -20,8 +20,7 @@ namespace Yugioh_AtemReturns.Duelists
 
     partial class Player : Duelist
     {
-        protected int tribute;
-        protected int requireTribute;
+
 
         private InputController input;
 
@@ -29,34 +28,6 @@ namespace Yugioh_AtemReturns.Duelists
         {
             get { return input; }
             set { input = value; }
-        }
-
-        public ePlayerStatus Status
-        {
-            get
-            {
-                return m_status;
-            }
-            set
-            {
-                m_status = value;
-                switch (value)
-                {
-                    case ePlayerStatus.IDLE:
-                        SummonBuffer = null;
-                        break;
-                    case ePlayerStatus.WAITFORTRIBUTE:
-
-                        break;
-                    case ePlayerStatus.SUMONNING:
-                        this.CurNormalSummon--;
-                        Hand.SendTo(SummonBuffer, eDeckId.MONSTERFIELD);
-                        this.Status = ePlayerStatus.IDLE;
-                        break;
-                    default:
-                        break;
-                }
-            }
         }
            
         public event UpdatePhase UpdatePhase;
@@ -70,6 +41,7 @@ namespace Yugioh_AtemReturns.Duelists
             : base(ePlayerId.PLAYER)
         {
         }
+
 
         public override void Init()
         {
@@ -112,7 +84,11 @@ namespace Yugioh_AtemReturns.Duelists
         public override void Init(Microsoft.Xna.Framework.Content.ContentManager _content)
         {
             base.Init(_content);
-            this.MainDeck.CreateDeck(_content, "1");
+            this.MainDeck.Init(_content, "1");
+            this.GraveYard.Init(_content);
+            this.Lp_change.Position = GlobalSetting.Default.LP_Change;
+            this.LifePoint = GlobalSetting.Default.MaxLP;
+            this.m_numsprite.Position = GlobalSetting.Default.LifePointNum;
         }
 
         public override void Update(Microsoft.Xna.Framework.GameTime _gameTime)
@@ -141,21 +117,13 @@ namespace Yugioh_AtemReturns.Duelists
             switch (Phase)
             {
                 case ePhase.STARTUP:
-                    if (this.Hand.IsAction == true)
-                        break;
-                    if (this.IsTurn == false)
-                        break;
-                    if (Hand.Count == 5)
-                    {
-                        Phase = ePhase.END;
-                    }
-                    else
-                        MainDeck.DrawCard();
+                    this.StartupPhase();
                     break;
                 case ePhase.DRAW:
-                    if (this.IsTurn == false)
-                        break;
-                    MainDeck.DrawCard();
+                    //if (this.IsTurn == false)
+                    //    break;
+                    if (PlayScene.TurnCounter >2)
+                        MainDeck.DrawCard();
                     Phase = ePhase.STANDBY;
                     break;
                 case ePhase.STANDBY:
@@ -179,6 +147,7 @@ namespace Yugioh_AtemReturns.Duelists
                     }
                     Phase = ePhase.DRAW;
                     IsTurn = false;
+
                     break;
                 case ePhase.TEST:
                     break;

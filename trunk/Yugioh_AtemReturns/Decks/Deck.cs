@@ -5,6 +5,8 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Yugioh_AtemReturns.Cards;
+using Microsoft.Xna.Framework.Content;
+using Yugioh_AtemReturns.Duelists;
 
 namespace Yugioh_AtemReturns.Decks
 {
@@ -17,11 +19,6 @@ namespace Yugioh_AtemReturns.Decks
         SPELLFIELD,
         GRAVEYARD,
         
-    }
-    public enum ePlayerId
-    {
-        PLAYER,
-        COMPUTER
     }
 
     delegate void CardAddedEventHandler(Deck sender, CardEventArgs e);
@@ -160,7 +157,7 @@ namespace Yugioh_AtemReturns.Decks
         public virtual LinkedListNode<Card> RemoveCard(Card _card)
         {
             LinkedListNode<Card> temp = ListCard.Find(_card);
-            ListCard.Remove(temp);
+                ListCard.Remove(temp);
             OnCardRemoved(new CardEventArgs(temp.Value));
             return temp;
         }
@@ -227,6 +224,9 @@ namespace Yugioh_AtemReturns.Decks
             }
   
         }
-
+        public override string ToString()
+        {
+            return this.Count.ToString();
+        }
     }
 }

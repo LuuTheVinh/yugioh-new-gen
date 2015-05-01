@@ -15,7 +15,6 @@ namespace Yugioh_AtemReturns.GameObjects
     class BattleSword :MyObject
     {
         private bool m_isShow;
-        private Timer m_timer;
 
         public bool IsShow
         {
@@ -104,7 +103,7 @@ namespace Yugioh_AtemReturns.GameObjects
         {
             this.Rotation = this.SetRotation(_card.Sprite.Bound.Center);
             this.AddMoveTo(
-                new MoveTo(0.5f, new Vector2(
+                new MoveTo(0.25f, new Vector2(
                       _card.Sprite.Bound.Center.X,
                       _card.Sprite.Bound.Center.Y)));
         }
@@ -115,7 +114,7 @@ namespace Yugioh_AtemReturns.GameObjects
             Point p = new Point((int)point_vt.X,(int)point_vt.Y);
             this.Rotation =this.SetRotation(p);
             this.AddMoveTo(
-                new MoveTo(0.6f, point_vt));
+                new MoveTo(0.3f, point_vt));
                     
         }
 

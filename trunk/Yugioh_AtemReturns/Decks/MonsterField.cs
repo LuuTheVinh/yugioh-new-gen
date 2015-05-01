@@ -53,6 +53,7 @@ namespace Yugioh_AtemReturns.Decks
         {
             get { return 5; }
         }
+        private Card[] m_cardslot;
         public MonsterField(ePlayerId _id)
             : base(_id, eDeckId.MONSTERFIELD)
         {
@@ -65,6 +66,7 @@ namespace Yugioh_AtemReturns.Decks
             this.CardAdded += new CardAddedEventHandler(MonsterField_CardAdded);
             this.CardRemoved +=new CardRemoveEventHandler(MonsterField_CardRemoved);
             m_aSlot = new bool[5];
+            m_cardslot = new Card[5];
         }
         public override void Update(GameTime _gameTime)
         {
@@ -73,6 +75,7 @@ namespace Yugioh_AtemReturns.Decks
         public override void Draw(SpriteBatch _spriteBatch)
         {
             _spriteBatch.Begin();
+
             base.Draw(_spriteBatch);
             _spriteBatch.End();
         }
@@ -83,21 +86,33 @@ namespace Yugioh_AtemReturns.Decks
         }
         private void MonsterField_CardAdded(Deck sender, CardEventArgs e)
         {
-            while (m_aSlot[CurrentSlot] == true)
+            //while (m_aSlot[CurrentSlot] == true)
+            //{
+            //    CurrentSlot++;
+            //}
+            //m_aSlot[CurrentSlot] = true;
+            while(m_cardslot[CurrentSlot] != null)
             {
                 CurrentSlot++;
             }
-            m_aSlot[CurrentSlot] = true;
+            m_cardslot[CurrentSlot] = e.Card;
         }
         private void MonsterField_CardRemoved(Deck sender, CardEventArgs e)
         {
-            try
+
+            //float CardX = e.Card.Position.X;
+            //float DeckX = sender.Position.X;
+            //if ((e.Card as Monster).BattlePosition == eBattlePosition.ATK)
+            //    m_aSlot[(int)(Math.Abs(CardX - DeckX) / GlobalSetting.Default.FieldSlot.X)] = false;
+            //else
+            //    m_aSlot[(int)(Math.Abs(CardX - e.Card.Origin.X- DeckX) / GlobalSetting.Default.FieldSlot.X)] = false;
+            for (int i = 0; i < m_cardslot.Length; i++)
             {
-                m_aSlot[Convert.ToInt32((e.Card.Position.X - sender.Position.X) / GlobalSetting.Default.FieldSlot.X)] = false;
-            }
-            catch
-            {
-                m_aSlot[Convert.ToInt32((sender.Position.X - e.Card.Position.X) / ComputerSetting.Default.FieldSlot.X)] = false;
+                if (object.ReferenceEquals(m_cardslot[i], e.Card) == true)
+                {
+                    m_cardslot[i] = null;
+                    return;
+                }
             }
         }
     }
