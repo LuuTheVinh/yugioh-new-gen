@@ -52,6 +52,7 @@ namespace Yugioh_AtemReturns.Cards.Monsters
             set
             {
                 battlePosition = value;
+
                 switch (value)
                 {
                     case eBattlePosition.ATK:
@@ -127,6 +128,23 @@ namespace Yugioh_AtemReturns.Cards.Monsters
                     throw new Exception("DEF Wrong");
                 else
                     def = value;
+            }
+        }
+        public int BattlePoint
+        {
+            get
+            {
+
+                if (this.BattlePosition == eBattlePosition.ATK)
+                {
+                    return this.atk;
+                }
+                else
+                {
+                    if (this.IsFaceUp == false)
+                        return 0;
+                    return this.def;
+                }
             }
         }
         public int Rank
@@ -207,6 +225,8 @@ namespace Yugioh_AtemReturns.Cards.Monsters
             this.SwitchBattlePosition = false;
             this.Origin = new Vector2(this.Sprite.Size.X / 2, this.Sprite.Size.Y / 2);
             this.AddRotateTo(new RotateTo(0.5f, 0));
+            if (this.IsFaceUp == false)
+                this.Flip();
         }
         public void Flip()
         {

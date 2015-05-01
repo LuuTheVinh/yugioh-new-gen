@@ -82,7 +82,14 @@ namespace Yugioh_AtemReturns.Manager
             {
                 return ("card_big\\" + _id.ToString().Substring(1));
             }
-
+            if (_id.ToString().StartsWith("lp"))
+            {
+                return ("General\\" + _id.ToString());
+            }
+            if (_id.ToString().StartsWith("font"))
+            {
+                return ("font\\" + _id.ToString());
+            }
             return _id.ToString();
         }
     }

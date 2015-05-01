@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Yugioh_AtemReturns.GameObjects;
 using Yugioh_AtemReturns.Manager;
 using Button = Yugioh_AtemReturns.GameObjects.Button;
+using Yugioh_AtemReturns.Duelists;
 
 namespace Yugioh_AtemReturns.Scenes
 {
@@ -17,7 +18,6 @@ namespace Yugioh_AtemReturns.Scenes
         private Button duleModeBtn, cardListBtn, deckEditorBtn, optionBtn, quitBtn;
         private Sprite menuBackground;
         private Point offsetButton;
-
         public override void Init(Game _game)
         {
             base.Init(_game);
@@ -29,7 +29,8 @@ namespace Yugioh_AtemReturns.Scenes
 
             //Button
             duleModeBtn = new Button(new Sprite(Game.Content, "Menu\\Button\\DuelMode_Normal"), new Sprite(Game.Content, "Menu\\Button\\DuelMode_Hover"));
-            duleModeBtn.Position = new Vector2(0, 0);
+            //duleModeBtn.Position = new Vector2(0, 0);
+            duleModeBtn.Position = Vector2.Zero;
             duleModeBtn.ButtonEvent += gotoDuelScene;
 
             cardListBtn = new Button(new Sprite(Game.Content, "Menu\\Button\\CardList_Normal"), new Sprite(Game.Content, "Menu\\Button\\CardList_Hover"));
@@ -44,7 +45,8 @@ namespace Yugioh_AtemReturns.Scenes
             quitBtn = new Button(new Sprite(Game.Content, "Menu\\Button\\Quit_Normal"), new Sprite(Game.Content, "Menu\\Button\\Quit_Hover"));
             quitBtn.Position = new Vector2(optionBtn.Position.X + optionBtn.Sprite.Size.X + offsetButton.X, optionBtn.Position.Y);
             quitBtn.ButtonEvent += new Action(quitButton);
-            menuBackground.Position = new Vector2(0,0);
+            menuBackground.Position = new Vector2(0, 0);
+
         }
 
         public override void Update(GameTime gametime)
@@ -81,8 +83,7 @@ namespace Yugioh_AtemReturns.Scenes
 
         private void gotoDuelScene()
         {
-            var playScene = new PlayScene();
-           
+            var playScene = new PlayScene(ePlayerId.PLAYER);
             SceneManager.GetInstance().ReplaceScene(playScene);
 
         }

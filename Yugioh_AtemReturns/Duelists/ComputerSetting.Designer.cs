@@ -61,7 +61,7 @@ namespace Yugioh_AtemReturns.Duelists {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("12, 0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("4, 0")]
         public global::Microsoft.Xna.Framework.Vector2 HandDistance {
             get {
                 return ((global::Microsoft.Xna.Framework.Vector2)(this["HandDistance"]));
@@ -83,6 +83,33 @@ namespace Yugioh_AtemReturns.Duelists {
         public global::Microsoft.Xna.Framework.Vector2 FieldSlot {
             get {
                 return ((global::Microsoft.Xna.Framework.Vector2)(this["FieldSlot"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("15, 45")]
+        public global::Microsoft.Xna.Framework.Vector2 LPBAR {
+            get {
+                return ((global::Microsoft.Xna.Framework.Vector2)(this["LPBAR"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500, 95")]
+        public global::Microsoft.Xna.Framework.Vector2 LP_Change {
+            get {
+                return ((global::Microsoft.Xna.Framework.Vector2)(this["LP_Change"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("63, 8")]
+        public global::Microsoft.Xna.Framework.Vector2 LifePointNum {
+            get {
+                return ((global::Microsoft.Xna.Framework.Vector2)(this["LifePointNum"]));
             }
         }
     }

@@ -15,6 +15,10 @@ namespace Yugioh_AtemReturns
         pha_s_ba, pha_s_dr, pha_s_en, pha_s_m1, pha_s_m2, pha_s_st,
 
         eff_y_circle, atk_sword,
+        lp_bar, lp_extract,
+        font_68_whitenum, font_710_blacknum, font_710_bluenum,
+        font_710_rednum, font_710_whitenum,font_710_yellownum,
+        font_812_whitenum, font_1640_damage,font_2634_dorangenum,
 
         C1002,
         C1003,
@@ -44,6 +48,9 @@ namespace Yugioh_AtemReturns
     {
         CARD,
         BATTLE_SWORD,
+        HEALTH_BAR,
+        LP_CHANGE,
+        NUM
     }
 
     public enum STATUS

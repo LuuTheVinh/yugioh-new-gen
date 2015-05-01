@@ -27,6 +27,8 @@ namespace Yugioh_AtemReturns.Duelists
             //e.Card.STATUS = STATUS.ATK;
             (e.Card as Monster).BattlePosition = eBattlePosition.ATK;
             e.Card.STATUS = STATUS.NORMAL;
+            e.Card.Sprite.Origin = Vector2.Zero;
+
             //if ((sender as Deck).Count < 16)
             //    e.Card.Position = GlobalSetting.Default.PlayerGrave - new Vector2(((sender as Deck).Count - 1) / 2);
             //else
@@ -46,7 +48,7 @@ namespace Yugioh_AtemReturns.Duelists
 
                     e.Card.AddMoveTo(new MoveTo(0.3f, new Vector2(
                         sender.Position.X + ((MonsterField)sender).CurrentSlot * GlobalSetting.Default.FieldSlot.X + 15,
-                        this.MonsterField.Position.Y + 23) + e.Card.Origin
+                        sender.Position.Y + 15) + e.Card.Origin
                         ));
                     e.Card.AddRotateTo(new RotateTo(0.3f, 90));
                     ((MonsterField)sender).CurrentSlot++;
@@ -89,6 +91,8 @@ namespace Yugioh_AtemReturns.Duelists
                 case ePlayerStatus.IDLE:
                     if ((sender as Monster).SwitchBattlePosition == false)
                         break;
+                    if (this.Phase == ePhase.BATTLE)
+                        break;
                     switch ((sender as Monster).BattlePosition)
 	                {
                         case eBattlePosition.ATK:
@@ -106,7 +110,7 @@ namespace Yugioh_AtemReturns.Duelists
 
                     this.MonsterField.SendTo(sender, eDeckId.GRAVEYARD);
                     this.tribute++;
-                    if (this.tribute == this.requireTribute)
+                    if (this.tribute == this.RequireTribute)
                     {
                         this.Status = ePlayerStatus.SUMONNING;
                     }
@@ -177,6 +181,7 @@ namespace Yugioh_AtemReturns.Duelists
         #region Hand Implement Event
         private void Hand_CardAdded(Deck sender, CardEventArgs e)
         {
+            e.Card.IsFaceUp = true;
             e.Card.LeftClick += Hand_CardLeftClick;
             e.Card.RightClick += Hand_CardRightClick;
             e.Card.Hovered += Hand_CardOnHover;
@@ -194,40 +199,56 @@ namespace Yugioh_AtemReturns.Duelists
             int count = sender.Count;
             if (count == 0) return;
             Vector2[] _position = new Vector2[sender.Count];
-            _position[0] = new Vector2(
-                    GlobalSetting.Default.CenterField.X - (sender.ListCard.First.Value.Sprite.Bound.Width + GlobalSetting.Default.HandDistance.X) * count / 2,
-                    sender.Position.Y);
-            for (int i = 1; i < _position.Length; i++ )
-            {
-                _position[i] = new Vector2(
-                    _position[i - 1].X + sender.ListCard.First.Value.Sprite.Bound.Width + GlobalSetting.Default.HandDistance.X,
-                    sender.Position.Y);
-            }
 
-            //sender.ListCard.Last.Value.Position = new Vector2(
-            //        GlobalSetting.Default.CenterField.X - (sender.ListCard.First.Value.Sprite.Bound.Width + GlobalSetting.Default.HandDistance.X) * count / 2,
-            //        sender.Position.Y);
+            if (count <= 6) //if (true)//
+            {
+                _position[0] = new Vector2(
+                    GlobalSetting.Default.CenterField.X + (sender.ListCard.First.Value.Sprite.Bound.Width + GlobalSetting.Default.HandDistance.X) * (count - 2) / 2,
+                    sender.Position.Y);
+                for (int i = 1; i < _position.Length; i++)
+                {
+                    _position[i] = new Vector2(
+                        _position[i - 1].X - sender.ListCard.First.Value.Sprite.Bound.Width - GlobalSetting.Default.HandDistance.X,
+                        sender.Position.Y);
+                }
+            }//if
+            else
+            {
+                _position[_position.Length-1] = new Vector2(299,555);
+                int dis = 410 / (count - 1);
+                for (int i = _position.Length - 2; i >= 0; i--)
+                {
+                    _position[i] = new Vector2(
+                        _position[i + 1].X + dis,
+                        _position[i + 1].Y);
+                }
+            }//else
             sender.ListCard.Last.Value.AddMoveTo(new MoveTo(0.5f, _position[0]));
             LinkedListNode<Card> node = sender.ListCard.Last.Previous;
             int j = 1;
             while (node != null)
             {
-                //node.Value.Position = new Vector2(
-                //    node.Next.Value.Sprite.Bound.Right + GlobalSetting.Default.HandDistance.X,
-                //    sender.Position.Y);
-                node.Value.AddMoveTo(new MoveTo(0.5f,_position[j++]));
+                node.Value.AddMoveTo(new MoveTo(0.5f, _position[j++]));
                 node = node.Previous;
-            }
+            }//while
         }
         private void Hand_CardAdded_ScaleCard(Deck sender, CardEventArgs e)
         {
-            //e.Card.AddScaleTo(new ScaleTo(2f, new Vector2(0.75f, 1.5f)));
-            //e.Card.AddScaleTo(new ScaleTo(2f, new Vector2(1.5f, 1.5f)));
-            e.Card.Scale = new Vector2(1.5f);
+            //e.Card.AddScaleTo(new ScaleTo(0.10f, new Vector2(0.2f, 1.5f)));
+            float dep = (float)1 / this.Hand.Count;
+            int i = 0;
+            foreach (var card in Hand.ListCard)
+            {
+                card.Sprite.Depth = dep * i++;
+            }
+            sender.ListCard.Last.Value.Sprite.WaitFor(MainDeck.Backside);
+            e.Card.Scale = new Vector2(0.0f, 1.5f);
+            e.Card.AddScaleTo(new ScaleTo(0.25f, new Vector2(1.5f, 1.5f)));
         }
         private void Hand_CardRemoved_ScaleCard(Deck sender, CardEventArgs e)
         {
             //e.Card.SCALE = new Vector2(1.0f);
+            e.Card.Sprite.Depth = 1.0f;
             e.Card.AddScaleTo(new ScaleTo(0.5f,new Vector2(1.0f)));
         }
 
@@ -244,36 +265,33 @@ namespace Yugioh_AtemReturns.Duelists
                 case eCardType.MONSTER:
                     if (this.CurNormalSummon <= 0)
                         return;
+                    if (this.MonsterField.Count == MonsterField.MaxCard)
+                        return;
                     this.tribute = 0;
-                    this.requireTribute = 0;
+                    this.RequireTribute = 0;
                     if (((Monster)sender).Original.Level >= 5 && this.Status == ePlayerStatus.IDLE)
                     {
                         if (((Monster)sender).Original.Level == 5 || ((Monster)sender).Original.Level == 6)
                         {
-                            this.requireTribute = 1;
+                            this.RequireTribute = 1;
                         }
                         else
                         {
-                            this.requireTribute = 2;
+                            this.RequireTribute = 2;
                         }
-                        if (this.MonsterField.Count < this.requireTribute)
+                        if (this.MonsterField.Count < this.RequireTribute)
                             return;
                         this.Status = ePlayerStatus.WAITFORTRIBUTE;
                         if (!PlayScene.YNDialog.IsShow && this.SummonBuffer == null)
                         {
-                            PlayScene.YNDialog.Show("Summon this monster require " + this.requireTribute.ToString() + " monster tribute. Do you want to summon?");
+                            PlayScene.YNDialog.Show("Summon this monster require " + this.RequireTribute.ToString() + " monster tribute. Do you want to summon?");
                             this.SummonBuffer = sender;
                             //sender.STATUS = STATUS.ATK;
                             (sender as Monster).BattlePosition = eBattlePosition.ATK;
                             return;
                         }
                     }
-                    else
-                    {
-                        //return;//test
-                        if (this.MonsterField.Count == MonsterField.MaxCard)
-                            return;
-                    }
+
                     SummonBuffer = sender;
                     this.Status = ePlayerStatus.SUMONNING;
                     //sender.STATUS = STATUS.ATK;
@@ -298,36 +316,39 @@ namespace Yugioh_AtemReturns.Duelists
 
         private void Hand_CardRightClick(Card sender, EventArgs e)
         {
+            if ((sender as Monster).Button.Hovered == false)
+                return;
+            if (IsTurn == false)
+                return; 
             if (this.Status != ePlayerStatus.IDLE)
                 return; 
-            if (IsTurn == false)
-                return;
+
+
             if (Phase != ePhase.MAIN1 && Phase != ePhase.MAIN2)
                 return;
-
             switch (sender.CardType)
             {
                 case eCardType.MONSTER:
                     if (this.CurNormalSummon <= 0)
                         return;
                     this.tribute = 0;
-                    this.requireTribute = 0;
+                    this.RequireTribute = 0;
                     if (((Monster)sender).Original.Level >= 5 && this.Status == ePlayerStatus.IDLE)
                     {
                         if (((Monster)sender).Original.Level == 5 || ((Monster)sender).Original.Level == 6)
                         {
-                            this.requireTribute = 1;
+                            this.RequireTribute = 1;
                         }
                         else
                         {
-                            this.requireTribute = 2;
+                            this.RequireTribute = 2;
                         }
-                        if (this.MonsterField.Count < this.requireTribute)
+                        if (this.MonsterField.Count < this.RequireTribute)
                             return;
                         this.Status = ePlayerStatus.WAITFORTRIBUTE;
                         if (PlayScene.YNDialog.IsShow == false && this.SummonBuffer == null)
                         {
-                            PlayScene.YNDialog.Show("Summon this monster require " + Convert.ToString(this.requireTribute) + " monster tribute. Do you want to summon?");
+                            PlayScene.YNDialog.Show("Summon this monster require " + Convert.ToString(this.RequireTribute) + " monster tribute. Do you want to summon?");
                             this.SummonBuffer = sender;
                             //sender.STATUS = STATUS.DEF;
                             (sender as Monster).BattlePosition = eBattlePosition.DEF;
@@ -365,7 +386,17 @@ namespace Yugioh_AtemReturns.Duelists
         private void Hand_CardOnHover(Card sender, EventArgs e)
         {
             if (sender.IsAction)
-                return; 
+                return;
+            if (this.Hand.Count >= 6)
+            {
+                var card = this.Hand.ListCard.Find(sender).Previous;
+                if (card != null)
+                    if (card.Value.Button.Hovered == true)
+                    {
+                        card.Value.outHovered(EventArgs.Empty);
+                        card.Value.Button.Hovered = false;
+                    }
+            }
             sender.Position = new Vector2(
                 x: sender.Position.X,
                 y: GlobalSetting.Default.PlayerHand.Y - 30);

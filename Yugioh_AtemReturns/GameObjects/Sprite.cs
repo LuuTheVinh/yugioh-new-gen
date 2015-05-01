@@ -55,9 +55,11 @@ namespace Yugioh_AtemReturns.GameObjects
         public bool IsAction
         {
             get {
-                return (_moveList.Any() || _rotateList.Any() || _scaleList.Any());
+                return (_moveList.Any() || _rotateList.Any() || _scaleList.Any() || _fadeList.Any());
                 }
         }//
+
+        LinkedList<Animation> _waitList = new LinkedList<Animation>();
 
         #region Properties
 
@@ -240,10 +242,31 @@ namespace Yugioh_AtemReturns.GameObjects
             );
         }
 
+		//mới thêm
+        public void WaitFor(Sprite _waitsprite)
+        {
+            if (_waitsprite._fadeList.Any())
+                _waitList.Concat(_waitsprite._fadeList);
+            if (_waitsprite._moveList.Any())
+                _waitList.Concat(_waitsprite._moveList);
+            if (_waitsprite._rotateList.Any())
+                _waitList.Concat(_waitsprite._rotateList);
+            if (_waitsprite._scaleList.Any())
+                _waitList.Concat(_waitsprite._scaleList);
+        }
+		//
+        public void WaitFor(Animation _waitanimation)
+        {
+            _waitList.AddLast(_waitanimation);
+        }
         public virtual void Update(GameTime gameTime)
         {
             //THỰC HIỆN TỪNG CÁI ANIMATION TRONG CÁC LIST
             //MOVE TO
+            if (_waitList.Any(animation => animation.IsDoing)) // hình như cái này là lamda :D
+                return;
+            _waitList.Clear();//
+
             if (_moveList.Any())
             {
                 var first = _moveList.First();
@@ -341,11 +364,11 @@ namespace Yugioh_AtemReturns.GameObjects
 
             var distance = (float)Math.Sqrt(((Position.X - m_oldPosition.X) * (Position.X - m_oldPosition.X) +
                                         (Position.Y - m_oldPosition.Y) * (Position.Y - m_oldPosition.Y)));
-            
+
             if (m_moveDistance >= distance && !moveto.IsDone)
             {
                 //Kiểm tra lần di chuyển cuối cùng có vượt ra khỏi vị trí đích hay không
-                if ((float)Math.Sqrt(m_Velocity.X * m_Velocity.X + m_Velocity.Y * m_Velocity.Y) > (m_moveDistance - distance))
+                if ((float)Math.Sqrt(m_Velocity.X * m_Velocity.X + m_Velocity.Y * m_Velocity.Y) >= Math.Abs(m_moveDistance - distance))
                 {
                     //Nếu có thì gán vận tốc bằng quãng đường còn lại
                     //m_Velocity.X = nextposition.X - Position.X;
