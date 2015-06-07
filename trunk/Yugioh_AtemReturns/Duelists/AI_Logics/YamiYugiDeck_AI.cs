@@ -28,35 +28,61 @@ namespace Yugioh_AtemReturns.Duelists.AI_Logics
             spell = new LinkedList<Card>();
         }
 
-        private Card Summon(Computer _com)
+        private Card Summon(Computer _com, bool _is_ATK)
         {
             if (this.monster.Any() == false)
                 return null;
-            int atkHandMax = monster.Max(card => (card as Monster).Atk);
-            
-            var rtvalue = monster.Where(card => (card as Monster).Atk == atkHandMax).First();
-            (rtvalue as Monster).BattlePosition = eBattlePosition.ATK;
+            Card rtvalue;
+            if (_is_ATK == true)
+            {
+                int atkHandMax = monster.Max(card => (card as Monster).Atk); //tìm lá bài có max atk trên tay
+
+                rtvalue = monster.Where(card => (card as Monster).Atk == atkHandMax).First();
+                (rtvalue as Monster).BattlePosition = eBattlePosition.ATK;
+            }
+            else
+            {
+                int atkHandMin = monster.Max(card => (card as Monster).Def); //tìm lá bài có max def trên tay
+
+                rtvalue = monster.Where(card => (card as Monster).Def == atkHandMin).First();
+                (rtvalue as Monster).BattlePosition = eBattlePosition.DEF;
+            }
             if (Duelist.RequireTributer[(rtvalue as Monster).Level - 1] == 0)
-                return rtvalue;
+                return rtvalue;  // nếu level thấp không cần tribute thì return luôn
+
+            //ngược lại cần tribute thì kiểm tra xem, những lá bài cần tribute có mạnh hơn lá muôn summon không
+            // nếu mạnh hơn thì không summon
             if (_com.MonsterField.ListCard.Any())
             {
                 var tributemonster = _com.MonsterField.ListCard.OrderBy(
                         card => (card as Monster).BattlePoint).Take(2);
+                //nếu không đủ chỗ để summon nữa thì không summon
                 if (_com.MonsterField.Count - Duelist.RequireTributer[(rtvalue as Monster).Level - 1]
                            == _com.MonsterField.MaxCard)
                 {
                     this.monster.Remove(rtvalue);
-                    rtvalue = Summon(_com);
+                    rtvalue = Summon(_com, _is_ATK); // đệ quy
                 }
+
+                // nếu lá bài dùng để hi sinh mạnh hơn lá muốn summon thì bỏ qua
                 if ((rtvalue as Monster).BattlePoint < tributemonster.Max(card => (card as Monster).BattlePoint))
                 {
                     this.monster.Remove(rtvalue);
-                    rtvalue = Summon(_com);
+                    rtvalue = Summon(_com, _is_ATK);
                 }
+
+                //khi summon không thoả điều kiện thì bị remove. và lặp lại vòng đệ quy
+                // khi vào vòng đệ quy. lá mạnh nhất đã thay đổi.
+                // lại tiếp tục bếu không đủ điều kiện lại remove và vào vòng đệ quy.
+                // đến khi thoã điều kiện thì return
             }
             return rtvalue;
         }
-
+        private Card Set_CardDefence(Computer _com)
+        {
+            //if (this.monster.Any() == false)
+                return null;
+        }
         public Card Summon(Player _player, Computer _computer)
         {
             //hàm update kiểm tra trường hợp nào có thể summon, trường hợp nào có thể set def
@@ -65,22 +91,25 @@ namespace Yugioh_AtemReturns.Duelists.AI_Logics
             this.refresh(_computer);
             if (_player.MonsterField.Count == 0) // nếu đối thủ không có bài thì summon
             {
-                return this.Summon(_computer);
+                return this.Summon(_computer, true);
             }
             else
             {
                 if (_player.MonsterField.ListCard.All(card => (card as Monster).BattlePosition == eBattlePosition.DEF))
                 {
-                    return this.Summon(_computer);
+                    return this.Summon(_computer,true);
                 }
                 if ((_player.MonsterField.ListCard.Min(card => (card as Monster).BattlePoint)
                     <= this.monster.Max(card_ => (card_ as Monster).Atk)))
                 {
-                    return this.Summon(_computer);
+                    return this.Summon(_computer, true);
                 }
             }
+
+            return this.Summon(_computer, false);
             return null;
         }
+
         public void SelectATK(BattlePhase _battlephase,Player _player, Computer _computer)
         {
             Card monsterbeATK;
@@ -88,6 +117,7 @@ namespace Yugioh_AtemReturns.Duelists.AI_Logics
             Card monsteratk;
             if (_player.MonsterField.ListCard.Any())
             {
+                // chọn trước lá bị tấn công
                 minBattlePoint = _player.MonsterField.ListCard.Min(card => (card as Monster).BattlePoint);
                 monsterbeATK = _player.MonsterField.ListCard.Where(card => (card as Monster).BattlePoint == minBattlePoint).First();
             }
@@ -101,6 +131,7 @@ namespace Yugioh_AtemReturns.Duelists.AI_Logics
                 LinkedList<Card> list = new LinkedList<Card>(
                     _battlephase.List_monsterATK
                     .Where(card =>  (card as Monster).Atk > minBattlePoint));
+
                 if (list.Any())
                 {
                     monsteratk = list

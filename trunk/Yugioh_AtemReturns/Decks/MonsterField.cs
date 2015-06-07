@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Yugioh_AtemReturns.Cards.Monsters;
 using Yugioh_AtemReturns.Duelists;
+using Yugioh_AtemReturns.GameObjects;
 
 namespace Yugioh_AtemReturns.Decks
 {
@@ -78,6 +79,11 @@ namespace Yugioh_AtemReturns.Decks
 
             base.Draw(_spriteBatch);
             _spriteBatch.End();
+            foreach (Monster item in ListCard)
+            {
+                if (this.PlayerID == ePlayerId.PLAYER || item.BattlePosition == eBattlePosition.ATK)
+                    item.DrawNum(_spriteBatch);
+            }
         }
 
         public bool AnySlot()
@@ -86,26 +92,27 @@ namespace Yugioh_AtemReturns.Decks
         }
         private void MonsterField_CardAdded(Deck sender, CardEventArgs e)
         {
-            //while (m_aSlot[CurrentSlot] == true)
-            //{
-            //    CurrentSlot++;
-            //}
-            //m_aSlot[CurrentSlot] = true;
             while(m_cardslot[CurrentSlot] != null)
             {
                 CurrentSlot++;
             }
             m_cardslot[CurrentSlot] = e.Card;
+            Vector2 position = Vector2.Zero;
+            if (PlayerID == ePlayerId.PLAYER)
+            {
+                position = GlobalSetting.Default.PlayerMonF + new Vector2(5, 90)
+                    + GlobalSetting.Default.FieldSlot.X * CurrentSlot * Vector2.UnitX;
+            }
+            else
+            {
+                position = ComputerSetting.Default.MonsterField + new Vector2(5, 0)
+                    - ComputerSetting.Default.FieldSlot.X * CurrentSlot * Vector2.UnitX;
+            }
+            //if (this.PlayerID != ePlayerId.COMPUTER || (e.Card as Monster).BattlePosition != eBattlePosition.DEF)
+                (e.Card as Monster).ShowBattlePoint(position);
         }
         private void MonsterField_CardRemoved(Deck sender, CardEventArgs e)
         {
-
-            //float CardX = e.Card.Position.X;
-            //float DeckX = sender.Position.X;
-            //if ((e.Card as Monster).BattlePosition == eBattlePosition.ATK)
-            //    m_aSlot[(int)(Math.Abs(CardX - DeckX) / GlobalSetting.Default.FieldSlot.X)] = false;
-            //else
-            //    m_aSlot[(int)(Math.Abs(CardX - e.Card.Origin.X- DeckX) / GlobalSetting.Default.FieldSlot.X)] = false;
             for (int i = 0; i < m_cardslot.Length; i++)
             {
                 if (object.ReferenceEquals(m_cardslot[i], e.Card) == true)
@@ -114,6 +121,8 @@ namespace Yugioh_AtemReturns.Decks
                     return;
                 }
             }
+            (e.Card as Monster).ClearBattlePoint();
         }
+        //--
     }
 }
