@@ -34,6 +34,7 @@ namespace Yugioh_AtemReturns
         C90876561, C91152256, C95727991, C99785935,
 
         // Big Card
+        B83764719,
         BBackSide,
         B11549357, B13039848, B25652259, B28279543, B38033122,
         B39256679, B40640057, B41392891, B46986415, B52077741,
@@ -41,7 +42,20 @@ namespace Yugioh_AtemReturns
         B71413901, B72989439, B75347539, B78193831, B90876561,
         B91152256, B95727991, B99785935, B87796900,
 
+    }
 
+    public enum eSoundId
+    {
+        start,
+        m_menu,
+        m_duel1,
+        battle_turn,
+        attack,
+        card_move,
+        card_open,
+        damage,
+        life_up,
+        turn_change
     }
 
     public enum ID

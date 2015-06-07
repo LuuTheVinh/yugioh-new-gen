@@ -24,7 +24,7 @@ namespace Yugioh_AtemReturns.Scenes
         public static BattlePhase battlePhase;
 
         ePlayerId first;
-
+        bool isStart;
         public static int TurnCounter
         {
             get;
@@ -34,6 +34,7 @@ namespace Yugioh_AtemReturns.Scenes
         {
             this.first = _first;
             TurnCounter = 0;
+            isStart = true;
         }
         public override void Init(Game _game)
         {
@@ -83,10 +84,12 @@ namespace Yugioh_AtemReturns.Scenes
         }
         public override void Update(GameTime _gameTime)
         {
+            this.playStartupBackground();
+
             if (this.Game.IsActive == false)
                 return;
             if (Player.LifePoint == 0 || Computer.LifePoint == 0)
-                SceneManager.GetInstance().AddScene(new MenuScene());
+                SceneManager.GetInstance().ReplaceScene(new MenuScene());
             base.Update(_gameTime);
 
             YNDialog.Update(_gameTime);
@@ -124,6 +127,15 @@ namespace Yugioh_AtemReturns.Scenes
             battlePhase.Update(Player, Computer);
             battlePhase.Update(_gameTime);
             DetailSideBar.Update(_gameTime);
+        }
+
+        private void playStartupBackground()
+        {
+            if (isStart == true)
+            {
+                //EffectManager.GetInstance().Play(eSoundId.m_duel1);
+                isStart = false;
+            }
         }
 
         public override void Draw(SpriteBatch _spriteBatch)

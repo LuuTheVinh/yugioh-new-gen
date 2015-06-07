@@ -8,6 +8,7 @@ using Yugioh_AtemReturns.Manager;
 using Yugioh_AtemReturns.Duelists;
 using Yugioh_AtemReturns.Cards;
 using Yugioh_AtemReturns.Decks;
+using Yugioh_AtemReturns.Cards.Monsters;
 
 namespace Yugioh_AtemReturns.GameObjects
 {
@@ -85,6 +86,7 @@ namespace Yugioh_AtemReturns.GameObjects
         }
         public void Show(Card _card)
         {
+            //System.Diagnostics.Trace.WriteLine("Atttack from: " + (_card as Monster).Original.Name);
             this.Position = new Vector2(_card.Sprite.Bound.Center.X, _card.Sprite.Bound.Center.Y);
             this.Sprite.Frame = new Rectangle(0, 0, 35, 70);
             this.IsShow = true;
@@ -101,6 +103,7 @@ namespace Yugioh_AtemReturns.GameObjects
         }
         public void AttackTo(Card _card)
         {
+            //System.Diagnostics.Trace.WriteLine("Atttack to: " + (_card as Monster).Original.Name);
             this.Rotation = this.SetRotation(_card.Sprite.Bound.Center);
             this.AddMoveTo(
                 new MoveTo(0.25f, new Vector2(
@@ -120,6 +123,7 @@ namespace Yugioh_AtemReturns.GameObjects
 
         public void Hide()
         {
+
             this.IsShow = false;
         }
 

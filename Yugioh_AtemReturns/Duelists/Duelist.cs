@@ -150,6 +150,12 @@ namespace Yugioh_AtemReturns.Duelists
             set
             {
                 m_isTurn = value;
+                if (value == true)
+                {
+                    if (PlayScene.TurnCounter == 0)
+                        return;
+                    Yugioh_AtemReturns.Manager.EffectManager.GetInstance().Play(eSoundId.turn_change);
+                }
             }
         }
         public Card SummonBuffer

@@ -9,6 +9,7 @@ namespace Yugioh_AtemReturns.Duelists.AI_Logics
     interface AI
     {
         Card Summon(Player _player, Computer _computer);
+
         Card SetTrap(Player _player, Computer _computer);
         Card ActiveTrap(Player _player, Computer _computer);
         Card ActiveSpell(Player _player, Computer _computer);
@@ -20,5 +21,7 @@ namespace Yugioh_AtemReturns.Duelists.AI_Logics
         IEnumerable<Card> Tribute(Computer computer, int tri);
 
         void SelectATK(BattlePhase _battlephase,Player _player, Computer _computer);
+
+
     }
 }

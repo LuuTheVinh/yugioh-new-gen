@@ -112,7 +112,8 @@ namespace Yugioh_AtemReturns.Duelists
                 }
             }
 
-
+            //if (this.IsTurn == false)
+            //    return;
             base.Update(_gameTime);
             switch (Phase)
             {
@@ -120,8 +121,8 @@ namespace Yugioh_AtemReturns.Duelists
                     this.StartupPhase();
                     break;
                 case ePhase.DRAW:
-                    //if (this.IsTurn == false)
-                    //    break;
+                    if (this.IsTurn == false)
+                        break;
                     if (PlayScene.TurnCounter >2)
                         MainDeck.DrawCard();
                     Phase = ePhase.STANDBY;

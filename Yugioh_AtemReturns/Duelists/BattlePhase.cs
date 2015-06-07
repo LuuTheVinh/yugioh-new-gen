@@ -9,6 +9,9 @@ using Yugioh_AtemReturns.Cards.Monsters;
 using Yugioh_AtemReturns.Decks;
 using Yugioh_AtemReturns.GameObjects;
 using Microsoft.Xna.Framework.Content;
+using System.Diagnostics;
+using Yugioh_AtemReturns.Manager;
+using Microsoft.Xna.Framework.Audio;
 
 namespace Yugioh_AtemReturns.Duelists
 {
@@ -98,6 +101,10 @@ namespace Yugioh_AtemReturns.Duelists
             battleSword = new BattleSword(_content);
             m_timer = new Timer();
             this.Step = eBattleStep.ENDPHASE;
+#if DEBUG
+            Trace.Listeners.Add(new TextWriterTraceListener("debug.log"));
+            Trace.AutoFlush = true;
+#endif
         }
         public void Update(GameTime _gameTime)
         {
@@ -111,19 +118,27 @@ namespace Yugioh_AtemReturns.Duelists
             this.checkEndphase(_player, _computer);
 
 #if DEBUG
-            System.Diagnostics.Debug.WriteLine(this.Step.ToString());
+            //System.Diagnostics.Debug.WriteLine(this.Step.ToString());
+
 #endif
             switch (this.Step)
             {
                 case eBattleStep.START_STEP:
+                    if (EffectManager.GetInstance().GetState(eSoundId.battle_turn) == SoundState.Playing)
+                    {
+                        return;
+                        // do nohing 
+                        // just wait for sound end
+                    }
                     // Active card effect
                     this.MonsterATK = null;
                     this.MonsterBeATK = null;
                     this.LoseMonster = null;
                     this.isdestroy[0] = false;
                     this.isdestroy[1] = false;
-                    this.Step = eBattleStep.BATTLE_STEP;
                     m_timer.ResetStopWatch();
+
+                    this.Step = eBattleStep.BATTLE_STEP;
                     break;
                 case eBattleStep.BATTLE_STEP:
 
@@ -152,8 +167,8 @@ namespace Yugioh_AtemReturns.Duelists
                     {
                         if (MonsterATK == null)
                         {
-                            //chọn lá tấn công cho computer
-                            _computer.SelectMonsterATK(this);
+                            //chọn lá tấn công cho computer                
+                        _computer.SelectMonsterATK(this);
                         }
                         if (this.MonsterATK == null)
                         {
@@ -174,8 +189,11 @@ namespace Yugioh_AtemReturns.Duelists
                     if (battleSword.IsAction == false)
                     {
                         //Chạy một số animation
+
                         battleSword.Status = STATUS.SWORD_HALF;
-                        if (m_timer.StopWatch(500))
+                        EffectManager.GetInstance().Play(eSoundId.attack);
+                        //if (EffectManager.GetInstance().GetState(eSoundId.attack) == SoundState.Stopped)
+                        if (m_timer.StopWatch(EffectManager.GetInstance().GetDuration(eSoundId.attack)))
                         {
                             battleSword.Hide();
                             this.Step = eBattleStep.BEFORE_DS;
@@ -185,6 +203,7 @@ namespace Yugioh_AtemReturns.Duelists
                     break;
                 case eBattleStep.BEFORE_DS:
                     // flip face down monster
+                    EffectManager.GetInstance().Play(eSoundId.card_open);
                     if (this.MonsterBeATK != null)
                     {
                         if (this.MonsterBeATK.IsFaceUp == false)
@@ -317,8 +336,10 @@ namespace Yugioh_AtemReturns.Duelists
 
         public void Begin(Player _player, Computer _computer, ePlayerId _id)
         {
+            EffectManager.GetInstance().Play(eSoundId.battle_turn);
             this.Step = eBattleStep.START_STEP;
             this.m_playerTurn = _id;
+            this.List_monsterATK.Clear();
             if (m_playerTurn == ePlayerId.PLAYER)
             {
                 foreach (var card in _player.MonsterField.ListCard)

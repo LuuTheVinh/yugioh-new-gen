@@ -18,10 +18,11 @@ namespace Yugioh_AtemReturns.Scenes
         private Button duleModeBtn, cardListBtn, deckEditorBtn, optionBtn, quitBtn;
         private Sprite menuBackground;
         private Point offsetButton;
+        private bool isStart; // for sound
         public override void Init(Game _game)
         {
             base.Init(_game);
-
+            isStart = true;	//for sound
             offsetButton = new Point(10, 0);
 
             //Background
@@ -51,6 +52,7 @@ namespace Yugioh_AtemReturns.Scenes
 
         public override void Update(GameTime gametime)
         {
+            this.playStartupBackground();
             if (this.Game.IsActive == false)
                 return; 
             base.Update(gametime);
@@ -61,6 +63,18 @@ namespace Yugioh_AtemReturns.Scenes
             deckEditorBtn.Update(gametime);
             optionBtn.Update(gametime);
             quitBtn.Update(gametime);
+
+        }
+
+		//sound
+        private void playStartupBackground()
+        {
+
+            if (isStart == true)
+            {
+                //EffectManager.GetInstance().Play(eSoundId.m_menu);
+                isStart = false;
+            }
 
         }
 

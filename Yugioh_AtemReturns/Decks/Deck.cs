@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Yugioh_AtemReturns.Cards;
 using Microsoft.Xna.Framework.Content;
 using Yugioh_AtemReturns.Duelists;
+using Yugioh_AtemReturns.Manager;
 
 namespace Yugioh_AtemReturns.Decks
 {
@@ -115,6 +116,12 @@ namespace Yugioh_AtemReturns.Decks
             PlayerID = _playerID;
             this.DeckID = _deckid;
             this.Init();
+            this.CardAdded +=Deck_CardAddedPlaySound;
+        }
+
+        private void Deck_CardAddedPlaySound(Deck sender, CardEventArgs e)
+        {
+            EffectManager.GetInstance().Play(eSoundId.card_move);
         }
 
         protected virtual void Init()

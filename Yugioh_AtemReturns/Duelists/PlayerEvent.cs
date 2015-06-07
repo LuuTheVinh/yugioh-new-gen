@@ -19,20 +19,12 @@ namespace Yugioh_AtemReturns.Duelists
         {
             if (e.Card.STATUS == STATUS.TRIBUTE)
                 return;
-            //if (e.Card.STATUS == STATUS.DEF)
             if ((e.Card as Monster).BattlePosition == eBattlePosition.DEF)
                 e.Card.Sprite.Rotation = 0f;
-           // e.Card.AddMoveTo(new MoveTo(1f, e.Card.Position));
-            //e.Card.AddMoveTo(new MoveTo(1f, GlobalSetting.Default.PlayerGrave - new Vector2(((sender as Deck).Count - 1) / 2)));
-            //e.Card.STATUS = STATUS.ATK;
             (e.Card as Monster).BattlePosition = eBattlePosition.ATK;
             e.Card.STATUS = STATUS.NORMAL;
             e.Card.Sprite.Origin = Vector2.Zero;
 
-            //if ((sender as Deck).Count < 16)
-            //    e.Card.Position = GlobalSetting.Default.PlayerGrave - new Vector2(((sender as Deck).Count - 1) / 2);
-            //else
-            //    e.Card.Position = GlobalSetting.Default.PlayerGrave;
         }
         #endregion
         #region Monster Field Implement Event
@@ -124,7 +116,7 @@ namespace Yugioh_AtemReturns.Duelists
 
         private void MonsterField_CardRightClick(Card sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Right click");
+           // System.Diagnostics.Debug.WriteLine("Right click");
         }
         private void MonsterField_CardOutHover(Card sender, EventArgs e)
         {
@@ -161,12 +153,12 @@ namespace Yugioh_AtemReturns.Duelists
 
         private void SpellField_CardLeftClick(Card sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Clicked");
-            this.MonsterField.RemoveCard(sender);
+           // System.Diagnostics.Debug.WriteLine("Clicked");
+            //this.MonsterField.RemoveCard(sender);
         }
         private void SpellField_CardRightClick(Card sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Right click");
+           // System.Diagnostics.Debug.WriteLine("Right click");
         }
         private void SpellField_CardOutHover(Card sender, EventArgs e)
         {
@@ -316,7 +308,7 @@ namespace Yugioh_AtemReturns.Duelists
 
         private void Hand_CardRightClick(Card sender, EventArgs e)
         {
-            if ((sender as Monster).Button.Hovered == false)
+            if ((sender as Card).Button.Hovered == false)
                 return;
             if (IsTurn == false)
                 return; 

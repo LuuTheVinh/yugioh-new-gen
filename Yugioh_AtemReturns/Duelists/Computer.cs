@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Yugioh_AtemReturns.Duelists.AI_Logics;
 using Yugioh_AtemReturns.Scenes;
 using Yugioh_AtemReturns.GameObjects;
+using System.Diagnostics;
 
 namespace Yugioh_AtemReturns.Duelists
 {
@@ -110,7 +111,7 @@ namespace Yugioh_AtemReturns.Duelists
 
                     if (this.Status == ePlayerStatus.IDLE)
                     {
-                        if (CurNormalSummon != 0)
+                        if (CurNormalSummon != 0 && this.MonsterField.Count < this.MonsterField.MaxCard)
                         {
                             this.SummonBuffer = this.m_Ai_logics.Summon(PlayScene.Player, this);
                         }
@@ -118,14 +119,15 @@ namespace Yugioh_AtemReturns.Duelists
                         {
                             if (this.MonsterField.ListCard.Any(card => (card as Monster).CanATK))
                             {
-                                if (this.IsAction == false)
-                                this.Phase = ePhase.BATTLE;
+                                if (tributemonster.Any() == false)
+                                    this.Phase = ePhase.BATTLE;
                             }else
                             this.Phase = ePhase.END;
                             break;
                         }
                         if (SummonBuffer == null)
                         {
+                            //this.SummonBuffer = this.m_Ai_logics.Set(PlayScene.Player, this);
                             this.Phase = ePhase.END;
                             break;
                         }
@@ -133,6 +135,10 @@ namespace Yugioh_AtemReturns.Duelists
 
                         tributemonster = new LinkedList<Card>(this.m_Ai_logics.Tribute(this, tri));
 
+                        foreach (var item in tributemonster)
+                        {
+                            (item as Monster).CanATK = false;
+                        }
                         if (tri > 0)
                             this.Status = ePlayerStatus.WAITFORTRIBUTE;
                         else
@@ -157,6 +163,7 @@ namespace Yugioh_AtemReturns.Duelists
 
                     break;
                 case ePhase.BATTLE:
+
                     if (this.MonsterField.IsAction == true) break;
                     if (this.MonsterField.ListCard.Any(card => (card as Monster).CanATK))
                     {
@@ -193,14 +200,16 @@ namespace Yugioh_AtemReturns.Duelists
             switch ((e.Card as Monster).BattlePosition)
             {
                 case eBattlePosition.DEF:
-
-                    e.Card.Position = new Vector2(
-                        sender.Position.X - ((MonsterField)sender).CurrentSlot * ComputerSetting.Default.FieldSlot.X + 15,
-                        this.MonsterField.Position.Y + 23);
-                    ((MonsterField)sender).CurrentSlot++;
-                    e.Card.Sprite.Rotation = (float)(Math.PI / 2);
                     e.Card.Sprite.Origin = new Vector2(e.Card.Sprite.Texture.Bounds.Center.X, e.Card.Sprite.Texture.Bounds.Center.Y);
-                    e.Card.Sprite.Position += new Vector2(e.Card.Sprite.Bound.Width / 2, e.Card.Sprite.Bound.Width / 2);
+
+                    var position = new Vector2(
+                        sender.Position.X - ((MonsterField)sender).CurrentSlot * ComputerSetting.Default.FieldSlot.X + 15,
+                        this.MonsterField.Position.Y + 15);
+                    e.Card.AddMoveTo(new MoveTo(0.3f, position +e.Card.Origin));
+                    e.Card.AddRotateTo(new RotateTo(0.3f, 90));
+                    ((MonsterField)sender).CurrentSlot++;
+                    //e.Card.Sprite.Rotation = (float)(Math.PI / 2);
+                    //e.Card.Sprite.Position += new Vector2(e.Card.Sprite.Bound.Width / 2, e.Card.Sprite.Bound.Width / 2);
 
                     break;
                 case eBattlePosition.ATK:
@@ -254,7 +263,7 @@ namespace Yugioh_AtemReturns.Duelists
         
         private void MonsterField_CardRightClick(Card sender, EventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("Right click");
+           // System.Diagnostics.Debug.WriteLine("Right click");
         }        
         
         private void MonsterField_CardOnHover(Card sender, EventArgs e)
@@ -375,15 +384,24 @@ namespace Yugioh_AtemReturns.Duelists
         #region GraveYard Implement Event
         private void GraveYard_CardAdded(Deck sender, CardEventArgs e)
         {
+            //if ((e.Card as Monster).BattlePosition == eBattlePosition.DEF)
+            //    e.Card.Sprite.Rotation = 0f;
+            //if (e.Card.STATUS == STATUS.TRIBUTE)
+            //{
+            //    e.Card.Sprite.Origin = new Vector2(e.Card.Sprite.Size.X, e.Card.Sprite.Size.Y);
+            //    e.Card.Sprite.Position += e.Card.Sprite.Origin;
+            //}
+            //(e.Card as Monster).BattlePosition = eBattlePosition.ATK;
+
+            if (e.Card.STATUS == STATUS.TRIBUTE)
+                return;
+
             if ((e.Card as Monster).BattlePosition == eBattlePosition.DEF)
                 e.Card.Sprite.Rotation = 0f;
-            if (e.Card.STATUS == STATUS.TRIBUTE)
-            {
-                e.Card.Sprite.Origin = new Vector2(e.Card.Sprite.Size.X, e.Card.Sprite.Size.Y);
-                e.Card.Sprite.Position += e.Card.Sprite.Origin;
-            }
-            (e.Card as Monster).BattlePosition = eBattlePosition.ATK;
 
+            (e.Card as Monster).BattlePosition = eBattlePosition.ATK;
+            e.Card.STATUS = STATUS.NORMAL;
+            e.Card.Sprite.Origin = Vector2.Zero;
         }
         private void GraveYard_CardRemove(Deck sender, CardEventArgs e)
         {
