@@ -191,11 +191,11 @@ namespace Yugioh_AtemReturns.Cards
         }
         private void Card_Hovered(Card sender, EventArgs e)
         {
-#if DEBUG
-            if (true)
-#else
+//#if DEBUG
+//            if (true)
+//#else
             if (sender.IsFaceUp)
-#endif
+//#endif
                 PlayScene.DetailSideBar.SetCardPreview(sender.ToString());
             else
             {
