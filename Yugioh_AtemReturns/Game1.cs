@@ -28,13 +28,12 @@ namespace Yugioh_AtemReturns
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Scene introScene;
+        //AudioEngine ae = new AudioEngine(@"D:\7ung project\Yugioh_AtemReturns\Yugioh_AtemReturns\m_duel1.wav");
 
-
-        //MainDeck maindeck;
-        Sprite background;
-        //Yugioh_AtemReturns.Cards.Traps.Trap test0;
-        Duelist player;
-
+        //SoundEffect soundEffect;
+        //SoundEffectInstance soundEffectInstance;
+        //AudioEmitter audioEmmiter;
+        //AudioListener audioListenner;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -59,20 +58,18 @@ namespace Yugioh_AtemReturns
             base.Initialize();
 
             /////////
-            introScene = new IntroScene();
-
+//#if DEBUG
+//            introScene = new PlayScene(ePlayerId.PLAYER);
+//#else
+            introScene = new MenuScene();
+//#endif
             SceneManager.GetInstance().AddScene(introScene);
-            SceneManager.GetInstance().Init();
+            SceneManager.GetInstance().Init(this);
 
             //maindeck = new MainDeck(ePlayerId.PLAYER);
             //maindeck.CreateDeck(this.Content, "1");
             //maindeck.Position = new Vector2(0, 300);
 
-            background = new Sprite(this.Content, "fie_burn");
-            background.Position = new Vector2(0, 0);
-            background.Depth = 0.0f;
-            player = new Player();
-            player.IntiMainDeck(this.Content);
             //maindeck.Position = background.Position + GlobalSetting.Default.PlayerMain;
             //test0 = new Cards.Traps.Trap(this.Content, SpriteID.C3005);
             //test0.Postion = GlobalSetting.Default.PlayerSpellF + new Microsoft.Xna.Framework.Vector2(15, 8) + background.Position;
@@ -82,13 +79,22 @@ namespace Yugioh_AtemReturns
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
         /// </summary>
+        /// 
+        //SoundEffect sounde2;
+        //SoundEffectInstance seinstance;
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            //soundEffect = Content.Load<SoundEffect>("m_menu");
+            //soundEffectInstance = soundEffect.CreateInstance();
+            //sounde2 = Content.Load<SoundEffect>("m_duel1");
+            //seinstance = sounde2.CreateInstance();
+           // audioEmmiter = new AudioEmitter();
+           // audioListenner = new AudioListener();
             // TODO: use this.Content to load your game content here
-            SceneManager.GetInstance().Content = Content;
+            SceneManager.GetInstance().Game = this;
+            EffectManager.Init(Content);
         }
 
         /// <summary>
@@ -112,9 +118,9 @@ namespace Yugioh_AtemReturns
                 this.Exit();
 
             // TODO: Add your update logic here
-
+            //soundEffectInstance.Play();
+            //seinstance.Play();
             SceneManager.GetInstance().Update(gameTime);
-            this.player.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -130,13 +136,12 @@ namespace Yugioh_AtemReturns
             // TODO: Add your drawing code here
             spriteBatch.Begin();
 
-            SceneManager.GetInstance().Draw(spriteBatch);
 
-            background.Draw(spriteBatch);
+
             //test0.Draw(spriteBatch);
             spriteBatch.End();
+            SceneManager.GetInstance().Draw(spriteBatch);
 
-            player.Draw(spriteBatch);
             //maindeck.Draw(spriteBatch);
 
             base.Draw(gameTime);
