@@ -37,6 +37,8 @@ namespace Yugioh_AtemReturns.Scenes
 
         private Timer _myTimer;
 
+        private bool _start;
+
         public override void Init(Game game)
         {
             base.Init(game);
@@ -86,10 +88,14 @@ namespace Yugioh_AtemReturns.Scenes
             //Timer
             _myTimer = new Timer();
             _myTimer.ResetStopWatch();
+
+            _start = true;
         }
 
         private void OnButtonEventWithSender(object sender)
         {
+            EffectManager.GetInstance().Play(eSoundId.attack);
+
             foreach (var playerButton in _playerButtons)
             {
                 playerButton.Sprite.ClearAllAnimation();
@@ -132,6 +138,7 @@ namespace Yugioh_AtemReturns.Scenes
 
         private void PlayerGoBtnOnButtonEvent()
         {
+            EffectManager.GetInstance().Play(eSoundId.turn_change);
             GotoPlayScene();
         }
 
@@ -249,6 +256,14 @@ namespace Yugioh_AtemReturns.Scenes
 
         public override void Update(GameTime gametime)
         {
+            if (_start)
+            {
+                //Play
+                EffectManager.GetInstance().Play(eSoundId.m_duel1);
+
+                _start = false;
+            }
+
             base.Update(gametime);
 
             foreach (var playerButton in _playerButtons)
@@ -331,8 +346,9 @@ namespace Yugioh_AtemReturns.Scenes
                     if (_myTimer.StopWatch(2000.0f))
                     {
                         _playerGoBtn.Tag = "Show";
-                        _myTimer.ResetStopWatch();
+                        //_myTimer.ResetStopWatch();
                         _playerGoBtn.AddScaleTo(new ScaleTo(0.25f, new Vector2(1.0f, 1.0f)));
+                        EffectManager.GetInstance().Play(eSoundId.start);
                     }
                 }
             }
@@ -367,6 +383,8 @@ namespace Yugioh_AtemReturns.Scenes
 
         private void ChooseAgain()
         {
+            EffectManager.GetInstance().Play(eSoundId.turn_change);
+
             foreach (var playerButton in _playerButtons)
             {
                 playerButton.Enable = true;
