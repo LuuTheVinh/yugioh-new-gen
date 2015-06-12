@@ -30,6 +30,8 @@ namespace Yugioh_AtemReturns.Manager
         }
         public static EffectManager GetInstance()
         {
+			if (m_instance == null)
+                m_instance = new EffectManager(_content);
             return m_instance;
         }
         public SoundEffectInstance GetSoundEffectInstance(eSoundId _id)
