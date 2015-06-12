@@ -30,9 +30,9 @@ namespace Yugioh_AtemReturns.GameObjects
         private float m_Timer = 0;
         //for Transforms
         //Move
-        private Vector2 m_oldPosition;                                              
-        private Vector2 m_Velocity;                                     
-        private float m_moveDistance;                                               
+        public Vector2 m_oldPosition;
+        public Vector2 m_Velocity;
+        public float m_moveDistance;                                               
         //Scale
         private Vector2 speedScale;
         private Vector2 scaleTotalValue;
@@ -182,6 +182,12 @@ namespace Yugioh_AtemReturns.GameObjects
             get { return m_Bound; }
             set { m_Bound = value; }
         }
+
+        public List<MoveTo> MoveList { get { return _moveList; } }
+        public List<ScaleTo> ScaleList { get { return _scaleList; } }
+        public List<RotateTo> RotateList { get { return _rotateList; } }
+        public List<Fade> FadeList { get { return _fadeList; } }
+
         #endregion
 
         public Sprite(ContentManager contentManager, String address)
@@ -562,5 +568,36 @@ namespace Yugioh_AtemReturns.GameObjects
         }
 
         #endregion
+
+        public void ClearAllAnimation()
+        {
+            _moveList.Clear();
+            _fadeList.Clear();
+            _rotateList.Clear();
+            _scaleList.Clear();
+        }
+
+        public void CopyAnimation(Sprite sprite)
+        {
+            if (sprite.MoveList != null && _moveList != sprite.MoveList)
+            {
+                _moveList = sprite.MoveList;
+            }
+
+            //Copy trạng thái hiện tại
+            m_moveDistance = sprite.m_moveDistance;
+            m_oldPosition = sprite.m_oldPosition;
+            m_Velocity = sprite.m_Velocity;
+                
+            //Tương tự move, làm sau
+            if (sprite.ScaleList != null && _scaleList != sprite.ScaleList)
+                _scaleList = sprite.ScaleList;
+
+            if (sprite.RotateList != null && _rotateList != sprite.RotateList)
+                _rotateList = sprite.RotateList;
+
+            if (sprite.FadeList != null && _fadeList != sprite.FadeList)
+                _fadeList = sprite.FadeList;
+        }
     }
 }
