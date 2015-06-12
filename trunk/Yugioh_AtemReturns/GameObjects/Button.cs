@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms.VisualStyles;
 using Yugioh_AtemReturns.Manager;
 
 namespace Yugioh_AtemReturns.GameObjects
 {
+    public delegate void ActionSender(object sender);
     /// <summary>
     /// Button có các chức năng Selected, Hovered, thực hiện sự kiện.
     /// Muốn tạo sự kiện cho Button click vào thì dùng ButtonEvent. Ví dụ:
@@ -37,12 +39,19 @@ namespace Yugioh_AtemReturns.GameObjects
                 if (isSelected)
                 {
                     if (selectedImage != null)
+                    {
+                        SelectedImage.CopyAnimation(Sprite);
                         this.Sprite = selectedImage;
+                    }
+                        
                 }
                 else
                 {
                     if (normalImage != null)
+                    {
+                        NormalImage.CopyAnimation(Sprite);
                         this.Sprite = normalImage;
+                    }
                 }
                 
             }
@@ -66,10 +75,18 @@ namespace Yugioh_AtemReturns.GameObjects
                 this.Rotation = this.Sprite.Rotation;
                 isHovered = value;
                 if (value == true)
+                {
+                    HoverImage.CopyAnimation(Sprite);
                     this.Sprite = hoverImage;
-                else// ADD
+                }
+                else // ADD
+                {
                     if (normalImage != null)
+                    {
+                        normalImage.CopyAnimation(Sprite);
                         this.Sprite = normalImage;
+                    }
+                }
             }
         }
         public Sprite NormalImage { get { return normalImage; } }
@@ -87,7 +104,8 @@ namespace Yugioh_AtemReturns.GameObjects
                 return hoverImage ?? normalImage;
             }
         }
-
+        public string Tag { get; set; }
+        public bool Enable { get; set; }
         #endregion
 
         public Button(Sprite image)
@@ -95,15 +113,17 @@ namespace Yugioh_AtemReturns.GameObjects
             this.Sprite = image;
             this.CanSelect = false;
             this.isSelected = false;
+            this.Enable = true;
         }
         public Button(Sprite normal, Sprite hover)
         {
             normalImage = normal;
             hoverImage = hover;
 
-            this.Sprite = normalImage;
+            this.Sprite = normal;
             this.CanSelect = false;
             this.isSelected = false;
+            this.Enable = true;
         }
         public Button(Sprite normal, Sprite hover, Sprite selected)
         {
@@ -111,9 +131,10 @@ namespace Yugioh_AtemReturns.GameObjects
             hoverImage = hover;
             selectedImage = selected;
 
-            this.Sprite = normalImage;
+            this.Sprite = normal;
             this.CanSelect = true;
             this.isSelected = false;
+            this.Enable = true;
         }
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -126,9 +147,15 @@ namespace Yugioh_AtemReturns.GameObjects
             if (inputController == null)
                 inputController = new InputController();
             //base.Update(gameTime);
+
             //Mouse
-            this.CheckMouseUpdate();
             this.UpdateProperties();
+
+            //Enable mới kt chuột
+            if(Enable)
+                this.CheckMouseUpdate();
+            
+            base.Update(gameTime);
         }
 
         private void CheckMouseUpdate()
@@ -149,6 +176,7 @@ namespace Yugioh_AtemReturns.GameObjects
                     
                     this.Clicked = true;
                     this.DoButtonEvent();
+                    this.DoButtonEventWithSender(this);
                 }
                 else
                 {
@@ -173,20 +201,21 @@ namespace Yugioh_AtemReturns.GameObjects
 
             if (this.Sprite.Bound.Contains(inputController.MousePosition) && !isHovered)
             {
-                Debug.WriteLine("hovered!");
                 if (hoverImage != null)
                 {
-                    this.Sprite = hoverImage;
+                    HoverImage.CopyAnimation(Sprite);
+                    this.Sprite = HoverImage;
                 }
                 isHovered = true;
             }
 
-            if (!this.Sprite.Bound.Contains(inputController.MousePosition))
+            if (!this.Sprite.Bound.Contains(inputController.MousePosition) && isHovered)
             {
                 isHovered = false;
                 if (normalImage != null)
                 {
-                    this.Sprite = normalImage;
+                    NormalImage.CopyAnimation(Sprite);
+                    this.Sprite = NormalImage;
                 }
             }
 
@@ -194,18 +223,23 @@ namespace Yugioh_AtemReturns.GameObjects
             {
                 if (selectedImage != null)
                 {
-                    this.Sprite = selectedImage;
+                    SelectedImage.CopyAnimation(Sprite);
+                    this.Sprite = SelectedImage;
                 }
                 else if (normalImage != null)
                 {
-                    this.Sprite = normalImage;
+                    NormalImage.CopyAnimation(Sprite);
+                    this.Sprite = NormalImage;
                 }
             }
 
             inputController.End(); //End get inputController
         }
+
         public event Action ButtonEvent;
         public event Action RightClick;
+        public event ActionSender ButtonEventWithSender;
+
         private void DoButtonEvent()
         {
             if (ButtonEvent != null)
@@ -215,6 +249,11 @@ namespace Yugioh_AtemReturns.GameObjects
         {
             if (RightClick != null)
                 RightClick();
+        }
+        private void DoButtonEventWithSender(object sender)
+        {
+            if (ButtonEventWithSender != null)
+                ButtonEventWithSender(sender);
         }
         private void UpdateProperties()
         {
@@ -254,5 +293,6 @@ namespace Yugioh_AtemReturns.GameObjects
                     hoverImage.Origin = Sprite.Origin;
             }
         }
+
     }
 }
