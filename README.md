@@ -26,7 +26,7 @@ Thành viên:
 
 Features:
 <ul>
-<li>Trò chơi được chia thành hai phe, người chơi và computer. Phía Computer được tự động hoàn toàn</li>
+<li>Trò chơi được chia thành hai phe, người chơi và computer. Phía Computer được tự động hoàn toàn. Hai phe lần lượt chơi thông qua hệ thống phân chia turn và phase.</li>
 
 <li>Dữ liệu lá bài được lấy từ wiki, thông qua ứng dụng getdata: https://github.com/LuuTheVinh/yugioh-new-gen/tree/master/GetCardData</li>
 
@@ -38,6 +38,10 @@ Features:
 <ul>
 <br>
 
+Cấu trúc thư mục:
+  Yugioh_AtemReturns: thư mục project game chính https://github.com/LuuTheVinh/yugioh-new-gen/tree/master/Yugioh_AtemReturns
+  Yugioh_AtemReturnsContent: thư mục resource của game https://github.com/LuuTheVinh/yugioh-new-gen/tree/master/Yugioh_AtemReturnsContent
+  GetCardData: thư mục ứng dụng lấy dữ liệu lá bài https://github.com/LuuTheVinh/yugioh-new-gen/tree/master/GetCardData
+  
 Video Demo:
 https://www.youtube.com/watch?v=nzXBLP8NnpE
-
